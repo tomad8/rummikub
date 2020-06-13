@@ -1,0 +1,55 @@
+
+
+  .tile {
+    background-image: linear-gradient(to bottom right, #eee, #ddd);
+    /*background: rgb(230, 230, 230);*/
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    float: left;
+    height: 60px;
+    margin: 1px;
+    padding: 0;
+    width: 40px;
+    align-content: center;
+  }
+
+  .tile:focus {
+    outline: none;
+  }
+
+  .tile:hover {
+    border: 1px solid #000;
+  }
+
+  .tiletext {
+    position: relative;
+    top: -8px;
+    left: 3px;
+    background-image: linear-gradient(to bottom right, #ddd, #eee);
+    /*background: #eee;*/
+    /*border: 1px solid #ddd;*/
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 32px;
+    height: 32px;
+    padding: 0;
+    width: 32px;
+  }
+
+  .black {
+    color: black;
+  }
+
+  .red {
+    color: red;
+  }
+
+  .blue {
+    color: blue;
+  }
+
+  .orange {
+    color: darkorange;
+  }
