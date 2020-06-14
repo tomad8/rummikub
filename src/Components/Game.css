@@ -1,0 +1,12 @@
+
+
+  .game {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    align-content: center;
+    align-items: center;
+  }
+
+  

@@ -1,15 +1,7 @@
+
 .app {
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  align-content: center;
-  align-items: center;
-  
-}
-
-.Appx {
-  text-align: center;
+  /*background-color: #eee;*/
 }
 
 .App-logo {
