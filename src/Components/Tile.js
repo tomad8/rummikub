@@ -12,6 +12,12 @@ class Tile extends React.Component {
       //colourIndex = id % 4;
       className += ' empty'
     }
+    if (this.props.selected) {
+      className += ' selected'
+    }
+    if (this.props.clickable) {
+      className += ' clickable'
+    }
 
     return className;
   }
@@ -87,7 +93,7 @@ class Tile extends React.Component {
           {this.getText(this.props.id)}
         </div>
         <div className='tile-subscript'>
-          {this.props.id}
+          {this.props.debug ? this.props.id : ''}
         </div>
       </button>
     );

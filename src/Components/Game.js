@@ -50,6 +50,8 @@ class Game extends React.Component {
     //free up any resources?
   }
 
+
+
   resetGame() {
     const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
     const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
@@ -89,6 +91,8 @@ class Game extends React.Component {
 
   }
 
+
+  /********** ONCLICK HANDLERS **********/
 
   handleClickRackTile(tileId) {
     if (this.state.localSelectedTile === null && tileId >=0) {
@@ -292,44 +296,151 @@ class Game extends React.Component {
     }
   }
 
+  /********** METHODS EXECUTED DURING RENDER **********/
 
+  isClickable(tileId, setId, rackId) {
+    if (rackId !== this.state.localPlayer) {
+      // can never click other players tiles (even in debug!)
+      return false;
+    }
+    
+    if (this.state.localSelectedTile >= 0) {
+      // no tile selected - picking up
+
+      if (tileId < 0) {
+        //can't pick up an empty space
+        return false;
+      }
+
+      return true; //"select"
+
+    } else {
+      // tile selected - putting down
+
+      if ((rackId >= 0 ) 
+        && ((this.state.localSelectedSet === null)
+        || (this.state.racks[rackId].indexOf(-tileId) >= 0))) {
+        //can put down on rack anywhere, as long as tile picked up from rack or
+        //originated from rack (matches a negative numbered empty tile)
+        return true;
+      }
+      else if ((setId >=0 ) && this.state.localSelectedSet) {
+        //can put down on set anywhere (clicking same set will reselect, not move)
+        return true;
+      }
+
+      // anything else is not a valid move;
+      return false;
+    }
+  }
+
+  getSets() {
+    if (!this.state.sets) {
+      return [];
+    }
+
+    const sets = [];
+
+    const selectedTile = this.state.localSelectedTile;
+    for (let s = 0; s < this.state.sets.length; s++) {
+      //convert to class including tile id and state details
+      const setTiles = [];
+      for (let tileId of this.state.sets[s]) {
+        const selected = (tileId === selectedTile);
+        const clickable = this.isClickable(tileId, s, null);
+        setTiles.push({
+          id: tileId, 
+          selected: selected, 
+          clickable: clickable, 
+          debug: this.state.debugMode,
+        });
+      }
+      const clickable = this.isClickable(null, s, null);
+      sets.push({
+        id: s, 
+        tiles: setTiles, 
+        clickable: clickable,
+      });
+    }
+
+    return sets;
+  }
+
+  getTilesRack(playerIndex) {
+    //Assumption: player index is same as rack index
+    if (playerIndex === null) {
+      playerIndex = this.state.localPlayer;
+    }
+
+    if (!this.state.racks[playerIndex]) {
+      return [];
+    }
+
+    //convert to class including tile id and state details
+    const rackTiles = [];
+    for (let tileId of this.state.racks[playerIndex]) {
+      const selected = (tileId === this.state.localSelectedTile);
+      const clickable = this.isClickable(tileId, null, playerIndex);
+      rackTiles.push({
+        id: tileId, 
+        selected: selected, 
+        clickable: clickable, 
+        debug: this.state.debugMode,
+      });
+    }
+
+    return rackTiles;
+  }
+
+  getTileBag(playerIndex) {
+    if (!this.state.tileBag) {
+      return [];
+    }
+
+    //convert to class including tile id and state details
+    const tileBag = [];
+    for (let tileId of this.state.tileBag) {
+      const selected = (tileId === this.state.localSelectedTile);
+      const clickable = false;
+      tileBag.push({
+        id: tileId, 
+        selected: selected, 
+        clickable: clickable, 
+        debug: this.state.debugMode,
+      });
+    }
+
+    return tileBag;
+  }
 
   render() {
-    
-    //let thisPlayer = 1;
-    
+    const racks = [];
+    for (let r = 0; this.state.racks && r < this.state.racks.length; r++) {
+      if (r === this.state.localPlayer || this.state.debugMode) {
+        racks.push(
+          <Rack 
+            key={r}  
+            player={this.state.players[r].name}
+            tiles={this.getTilesRack(r)}
+            onClick={(tileId) => this.handleClickRackTile(tileId)}
+          />
+        )
+      }
+    }
+
     return (
       <div className='game'>
         <button onClick={() => this.resetGame()}>Reset</button>
         <Board 
-          sets={this.state.sets}
+          sets={this.getSets()}
           onClickTile={(tileId, setId) => this.handleClickBoardTile(tileId, setId)}
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
-        <Rack 
-          player='Player 1'
-          tiles={this.state.racks[0]}
-          onClick={(tileId) => this.handleClickRackTile(tileId)}
-        />
-        <Rack 
-          player='Player 2'
-          tiles={this.state.racks[1]}
-          onClick={(tileId) => this.handleClickRackTile(tileId)}
-        />
-        <Rack 
-          player='Player 3'
-          tiles={this.state.racks[2]}
-          onClick={(tileId) => this.handleClickRackTile(tileId)}
-        />
-        <Rack 
-          player='Player 4'
-          tiles={this.state.racks[3]}
-          onClick={(tileId) => this.handleClickRackTile(tileId)}
-        />
+        {racks}
 
         <Rack 
           player='Tile Bag'
-          tiles={this.state.tileBag}
+          tiles={this.getTileBag()}
         />
       </div>
     );

@@ -7,15 +7,17 @@ class Board extends React.Component {
   render() {
     const sets = [];
     if (this.props.sets) {
-      //for (const i of this.props.sets) {
-      for (let i = 0; i < this.props.sets.length; i++) {
-        if (this.props.sets[i]) {
+      for (const s of this.props.sets) {
+      //for (let i = 0; i < this.props.sets.length; i++) {
+        if (s) {
           sets.push(
             <Set 
-              key={i}
-              tiles={this.props.sets[i]} 
-              onClickTile={(TileId) => this.props.onClickTile(TileId, i)}
-              onClick={() => this.props.onClickSet(i)}
+              key={s.id}
+              id={s.id}
+              tiles={s.tiles} 
+              clickable={s.clickable}
+              onClickTile={(TileId) => this.props.onClickTile(TileId, s.id)}
+              onClick={() => this.props.onClickSet(s.id)}
             />
           )
         }
@@ -28,7 +30,9 @@ class Board extends React.Component {
         {sets}
         <Set 
             key={-1}
-            tiles={[-1]}
+            id={-1}
+            tiles={[{id: -1, selected: false, clickable: false}]}
+            clickable={false}
             onClickTile={(TileId) => this.props.onClickTile(TileId, -1)}
             onClick={() => this.props.onClickSet(-1)}
           />
