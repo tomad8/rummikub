@@ -12,15 +12,8 @@
     width: 40px;
     align-content: center;
     /*box-shadow: 2px 2px 3px #00000033;*/
-  }
 
-  .tile:focus {
-    outline: none;
-  }
-
-  .tile:hover {
-    border: 1px solid #000;
-    box-shadow: 0px 0px 5px #000000aa;
+    /*transition: transform 0.5s ease-out;*/
   }
 
   .tiletext {
@@ -32,7 +25,7 @@
     /*background: #eee;*/
     /*border: 1px solid #ddd;*/
     border: none;
-    border-radius: 10px;
+    border-radius: 16px;
     font-size: 20px;
     font-weight: bold;
     line-height: 32px;
@@ -41,11 +34,47 @@
     width: 32px;
   }
 
+  .empty {
+    border: 1px solid #eee;
+    background: #eee;
+    background-image: none;
+  }
+
+  .emptytext {
+    border: none;
+    background: #fff;
+    font-size: 32px;
+    color: #eee;
+  }
+
+  .tile:focus {
+    outline: none;
+  }
+
+ /* .tile:hover {
+    border: 1px solid #000;
+    box-shadow: 0px 0px 5px #000000aa;
+  }*/
+
+  .clickable:hover {
+    border: 1px solid #000;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
+  }
+
+  .selected {
+    border: 1px solid rgb(100, 200, 0);
+    box-shadow: 0px 0px 5px rgba(100, 200, 0, 0.8);
+    transform: scale(0.7)
+  }
+
+
+
   .tile-subscript {
     border: none;
     border-radius: 10px;
     font-size: 10px;
     line-height: 10px;
+    color: gray;
     padding: 0;
   }
 
@@ -58,7 +87,7 @@
   }
 
   .blue {
-    color: blue;
+    color: royalblue;
   }
 
   .orange {

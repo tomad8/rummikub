@@ -11,19 +11,22 @@ class Set extends React.Component {
           tiles.push(
           <Tile 
             key={i}
-            value={i} 
-            onClick={() => this.props.onClick(i)}
+            id={i} 
+            onClick={() => this.props.onClickTile(i)}
           />
         )
       }
     } else {
       tiles.push(
-        <div key={-1}>New set</div>
+        <div key={-1}>Empty set</div>
       )
     }
     
     return (
-      <div className='set'>
+      <div
+        className='set'
+        onClick={this.props.onClick}
+      >
         {tiles}
       </div>
     );

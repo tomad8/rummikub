@@ -16,7 +16,16 @@
     outline: none;
   }
 
-  .set:hover {
-    border: 1px solid #000;
+  /*.set:hover {
+    border: 1px solid black;
     box-shadow: 0px 0px 10px #000000aa;
+  }*/
+
+  .clickable {
+    cursor: pointer;
+  }
+  
+  .clickable:hover {
+    border: 1px solid black;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
   }

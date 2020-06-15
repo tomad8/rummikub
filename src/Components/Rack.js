@@ -11,7 +11,7 @@ class Rack extends React.Component {
           tiles.push(
           <Tile 
             key={i}
-            value={i} 
+            id={i} 
             onClick={() => this.props.onClick(i)}
           />
         )

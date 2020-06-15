@@ -14,7 +14,8 @@ class Board extends React.Component {
             <Set 
               key={i}
               tiles={this.props.sets[i]} 
-              onClick={() => this.props.onClick()}
+              onClickTile={(TileId) => this.props.onClickTile(TileId, i)}
+              onClick={() => this.props.onClickSet(i)}
             />
           )
         }
@@ -27,8 +28,9 @@ class Board extends React.Component {
         {sets}
         <Set 
             key={-1}
-            tiles={null}
-            onClick={() => this.props.onClick()}
+            tiles={[-1]}
+            onClickTile={(TileId) => this.props.onClickTile(TileId, -1)}
+            onClick={() => this.props.onClickSet(-1)}
           />
       </div>
     );
