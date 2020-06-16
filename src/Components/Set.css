@@ -21,11 +21,22 @@
     box-shadow: 0px 0px 10px #000000aa;
   }*/
 
-  .clickable {
+  .set-clickable {
+    /*box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);*/
     cursor: pointer;
   }
   
-  .clickable:hover {
+  .set-clickable:hover {
     border: 1px solid black;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
+  }
+
+  .set-invalid {
+    background: rgba(255, 0, 0, 0.4);
+  }
+
+  .set-empty {
+    border: 1px solid #eee;
+    background: #eee;
+    background-image: none;
   }

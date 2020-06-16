@@ -94,6 +94,7 @@ class Game extends React.Component {
 
   /********** ONCLICK HANDLERS **********/
 
+
   handleClickRackTile(tileId) {
     if (this.state.localSelectedTile === null && tileId >=0) {
       console.log('Tile ID = ' + tileId + ' selected in Rack');
@@ -217,6 +218,32 @@ class Game extends React.Component {
     
   }
 
+
+  /*
+    select scenarios:
+    
+      Rack.Tile
+      Set.Tile
+
+    move scenarios:
+
+      Click self (deselect)
+
+      Rack.Tile > Rack.Tile (swapRackTiles)
+      Rack.Tile > Rack (nothing)
+      Rack.Tile > Set.Tile (invoke following)
+      Rack.Tile > Set (removeRackTile + AddSetTile)
+      
+      Set.Tile > Rack.Tile (removeSetTile + addRackTile)
+      Set.Tile > Rack (nothing)
+
+      Set.Tile > Set.Tile - same set (nothing)
+      Set.Tile > Set - same set (nothing)
+      Set.Tile > Set.Tile - different set (invoke following)
+      Set.Tile > Set - different set (removeSetTile + addSetTile)
+    
+*/
+
   swapRackTiles(tileId1, tileId2) {
     console.log('Swapping Tile IDs = ' + tileId1 + ' and ' + tileId2 + ' on Rack');
     const racks = this.state.racks.slice();
@@ -299,16 +326,20 @@ class Game extends React.Component {
   /********** METHODS EXECUTED DURING RENDER **********/
 
   isClickable(tileId, setId, rackId) {
-    if (rackId !== this.state.localPlayer) {
+    if (rackId !== null && rackId !== this.state.localPlayer) {
       // can never click other players tiles (even in debug!)
       return false;
     }
     
-    if (this.state.localSelectedTile >= 0) {
+    if (this.state.localSelectedTile === null) {
       // no tile selected - picking up
 
       if (tileId < 0) {
         //can't pick up an empty space
+        return false;
+      }
+      else if (tileId === null && setId !== null) {
+        //can't pick up a set (only tiles within it)
         return false;
       }
 
@@ -317,21 +348,27 @@ class Game extends React.Component {
     } else {
       // tile selected - putting down
 
-      if ((rackId >= 0 ) 
+      if ((rackId !== null ) 
         && ((this.state.localSelectedSet === null)
         || (this.state.racks[rackId].indexOf(-tileId) >= 0))) {
         //can put down on rack anywhere, as long as tile picked up from rack or
         //originated from rack (matches a negative numbered empty tile)
         return true;
       }
-      else if ((setId >=0 ) && this.state.localSelectedSet) {
-        //can put down on set anywhere (clicking same set will reselect, not move)
+      else if (setId !== null && tileId === null && setId !== this.state.localSelectedSet) {
+        //set clickable, as long as not source 
         return true;
       }
 
       // anything else is not a valid move;
       return false;
     }
+  }
+
+  isSetValid(setId) {
+    
+    return this.state.sets[setId].length >= 3;
+
   }
 
   getSets() {
@@ -342,26 +379,45 @@ class Game extends React.Component {
     const sets = [];
 
     const selectedTile = this.state.localSelectedTile;
-    for (let s = 0; s < this.state.sets.length; s++) {
+    let s;
+    for (s = 0; s < this.state.sets.length; s++) {
       //convert to class including tile id and state details
       const setTiles = [];
       for (let tileId of this.state.sets[s]) {
-        const selected = (tileId === selectedTile);
-        const clickable = this.isClickable(tileId, s, null);
         setTiles.push({
           id: tileId, 
-          selected: selected, 
-          clickable: clickable, 
+          selected: (tileId === selectedTile), 
+          clickable: this.isClickable(tileId, s, null), 
           debug: this.state.debugMode,
         });
       }
-      const clickable = this.isClickable(null, s, null);
+      setTiles.sort((a, b) => a.id - b.id);
       sets.push({
         id: s, 
         tiles: setTiles, 
-        clickable: clickable,
+        clickable: this.isClickable(null, s, null),
+        valid: this.isSetValid(s),
       });
     }
+
+    //if (this.state.localSelectedTile !== null) {
+      // tile selected - show a new group option
+
+      const setTiles = [];
+      setTiles.push({
+        id: -1, 
+        selected: false, 
+        clickable: false, 
+        debug: this.state.debugMode,
+      });
+
+      sets.push({
+        id: -1, 
+        tiles: setTiles, 
+        clickable: (this.state.localSelectedTile !== null),
+        valid: true,
+      });
+    //}
 
     return sets;
   }

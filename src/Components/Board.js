@@ -16,6 +16,7 @@ class Board extends React.Component {
               id={s.id}
               tiles={s.tiles} 
               clickable={s.clickable}
+              valid={s.valid}
               onClickTile={(TileId) => this.props.onClickTile(TileId, s.id)}
               onClick={() => this.props.onClickSet(s.id)}
             />
@@ -28,14 +29,6 @@ class Board extends React.Component {
       <div className='board'>
         <div>Board</div>
         {sets}
-        <Set 
-            key={-1}
-            id={-1}
-            tiles={[{id: -1, selected: false, clickable: false}]}
-            clickable={false}
-            onClickTile={(TileId) => this.props.onClickTile(TileId, -1)}
-            onClick={() => this.props.onClickSet(-1)}
-          />
       </div>
     );
   }

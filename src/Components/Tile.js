@@ -10,13 +10,15 @@ class Tile extends React.Component {
     if (id < 0) {
       // alternate joker colours
       //colourIndex = id % 4;
-      className += ' empty'
+      className += ' tile-empty'
     }
+
     if (this.props.selected) {
-      className += ' selected'
+      className += ' tile-selected'
     }
+
     if (this.props.clickable) {
-      className += ' clickable'
+      className += ' tile-clickable'
     }
 
     return className;
@@ -31,7 +33,7 @@ class Tile extends React.Component {
     const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
     const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
    
-    let className = 'tiletext';
+    let className = 'tile-text';
     let colourIndex;
     
     if (id >= 0 && id < numberOfStandardTiles) {
@@ -49,11 +51,11 @@ class Tile extends React.Component {
 
     // we only handle max 4 suits here!
     switch (colourIndex) {
-      case 0: className += ' black'; break;
-      case 1: className += ' red'; break;
-      case 2: className += ' blue'; break;
-      case 3: className += ' orange'; break;
-      default: className += ' emptytext';
+      case 0: className += ' tile-black'; break;
+      case 1: className += ' tile-red'; break;
+      case 2: className += ' tile-blue'; break;
+      case 3: className += ' tile-orange'; break;
+      default: className += ' tile-emptytext';
     }
 
     return className;
