@@ -101,6 +101,13 @@
     color: darkorange;
   }
 
+  .tile-purple {
+    color: darkviolet;
+  }
+
+  .tile-pink {
+    color: violet;
+  }
   
   @keyframes drop-in {
     0% {

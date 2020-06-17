@@ -25,64 +25,25 @@ class Tile extends React.Component {
   }
 
   getTextClassName(id) {
-    const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
-    const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
-    const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
-    const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
-    const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
-    const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
-    const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
-   
     let className = 'tile-text';
-    let colourIndex;
-    
-    if (id >= 0 && id < numberOfStandardTiles) {
-      // cycle colour every 13, repeating after 52
-      //colourIndex = Math.floor((id % 52) / 13);
-      colourIndex = Math.floor((id % numberOfTilesPerDeck) / numberOfRanks);
-    } else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
-      // alternate joker colours
-      //colourIndex = id % 4;
-      colourIndex = id % numberOfSuits;
-    } else {
-      // empty tile
-      colourIndex = null;
-    }
+    let colourIndex = getTileSuitFromId(id);
 
-    // we only handle max 4 suits here!
+    // we only handle max 6 suits.colours here (should be plenty, default is 4)
     switch (colourIndex) {
       case 0: className += ' tile-black'; break;
       case 1: className += ' tile-red'; break;
       case 2: className += ' tile-blue'; break;
       case 3: className += ' tile-orange'; break;
+      case 4: className += ' tile-purple'; break;
+      case 5: className += ' tile-pink'; break;
       default: className += ' tile-emptytext';
     }
 
     return className;
   }
   
-  getText(id) {
-    const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
-    const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
-    const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
-    const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
-    const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
-    const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
-    const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
-   
-    if (id >= 0 && id < numberOfStandardTiles) {
-      //return (id % 13) + 1;
-      return (id % Constants.NUMBER_OF_TILE_RANKS) + 1;
-    } else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
-      return Constants.JOKER_DISPLAY_CHARACTER;
-    } else if (id < 0) {
-      // empty tile
-      return '+';
-    } else {
-      // invalid tile
-      return null;
-    }
-
+  getText(id) {    
+    return getTileRankFromId(id);
   }
 
   render() {
@@ -103,3 +64,49 @@ class Tile extends React.Component {
 }
 
 export default Tile;
+
+
+function getTileSuitFromId(id) {
+  const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
+  const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
+  const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
+  const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
+  const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
+  const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
+  const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
+  
+  let suit = null;
+  if (id >= 0 && id < numberOfStandardTiles) {
+    suit = Math.floor(id / numberOfDecks) % numberOfSuits;
+  } 
+  else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
+    // alternate joker colours
+    suit = id % numberOfSuits;
+  }
+
+  return suit;
+}
+
+function getTileRankFromId(id) {
+  const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
+  const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
+  const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
+  const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
+  const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
+  const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
+  const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
+  
+    let rank = null;
+  if (id >= 0 && id < numberOfStandardTiles) {
+    rank = (Math.floor((id / numberOfDecks / numberOfSuits)) % numberOfRanks) + 1;
+  } 
+  else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
+    rank = Constants.JOKER_DISPLAY_CHARACTER;
+  } 
+  else if (id < 0) {
+    // empty tile
+    rank = '+';
+  }
+
+  return rank;
+}

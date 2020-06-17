@@ -3,7 +3,7 @@
 export const NUMBER_OF_TILE_SUITS = 4;      // Official rules: 4
 export const NUMBER_OF_TILE_RANKS = 13;     // Official rules: 13
 export const NUMBER_OF_TILE_DECKS = 2;      // Official rules: 2
-export const NUMBER_OF_TILE_JOKERS = 2;     // Official rules: 2
+export const NUMBER_OF_TILE_JOKERS = 4;     // Official rules: 2
 
 // Used in Game.js
 export const NUMBER_OF_PLAYERS = 4;             // Official rules: 2 to 4
