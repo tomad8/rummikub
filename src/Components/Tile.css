@@ -63,13 +63,19 @@
 
   .tile-clickable:hover {
     border: 1px solid #000;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
   }
 
-  .tile-selected, .tile-selected:hover {
+  .tile-selected {
     border: 1px solid rgb(100, 200, 0);
-    box-shadow: 0px 0px 5px rgba(100, 200, 0, 0.8);
-    transform: scale(1.1)
+    box-shadow: 0px 0px 5px rgba(100, 200, 0, 0.6);
+    transform: scale(1.15);
+    animation: pick-up 0.3s ease;
+  }
+
+  .tile-selected:hover {
+    border: 1px solid rgb(100, 200, 0);
+    box-shadow: 0px 0px 5px rgba(100, 200, 0, 0.6);
   }
 
   .tile-moved {
@@ -109,10 +115,19 @@
     color: violet;
   }
   
+  @keyframes pick-up {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.15);
+    }
+  }
+
   @keyframes drop-in {
     0% {
       opacity: 50%;
-      transform: scale(1.25);
+      transform: scale(1.15);
     }
 
     100% {

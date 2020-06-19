@@ -25,11 +25,12 @@ class Set extends React.Component {
   render() {
     const tiles = [];
     if (this.props.tiles) {
+      let uniqueId = -1;
       for (const i of this.props.tiles) {
           tiles.push(
           <Tile 
-            key={i.id}
-            id={i.id} 
+            key={i.id !== null ? i.id : uniqueId}
+            id={i.id !== null ? i.id : uniqueId--} 
             selected={i.selected}
             clickable={i.clickable}
             debug={i.debug}

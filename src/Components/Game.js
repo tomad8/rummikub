@@ -35,6 +35,7 @@ class Game extends React.Component {
         racks: [],
         sets: [],
       },
+      latestMovedTile: null,
       localPlayer: 0,
       localSelectedTile: null,
       localSelectedSet: null,
@@ -50,7 +51,11 @@ class Game extends React.Component {
     //free up any resources?
   }
 
-
+  logDebug(text) {
+    if (this.state.debugMode) {
+      console.log(text);
+    }
+  }
 
   resetGame() {
     const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
@@ -80,11 +85,13 @@ class Game extends React.Component {
       tileBag: tiles,
       racks: racks,
       sets: [],
+      currentPlayer: 0,
       commitedState: {
-        tileBag: [],
-        racks: [],
+        tileBag: tiles,
+        racks: racks,
         sets: [],
       },
+      latestMovedTile: null,
       localSelectedTile: null,
       localSelectedSet: null,
     });
@@ -96,36 +103,34 @@ class Game extends React.Component {
 
 
   handleClickRackTile(tileId) {
+    /*if (!this.isClickable(tileId, null, this.state.localPlayer)) {
+      // no clicking if not clickable!
+      // This is kludge to prevent clicking other player racks in debugMode
+      return;
+    }*/
+    
+    
     if (this.state.localSelectedTile === null && tileId >=0) {
-      console.log('Tile ID = ' + tileId + ' selected in Rack');
-      // no tile already selected - select this one if valid
-      this.setState({
-        localSelectedTile: tileId,
-        localSelectedSet: null,
-      });
-    } else if (this.state.localSelectedTile === tileId) {
+      // no tile selected - select this one if valid
+      this.selectTile(tileId, null);
+    } 
+    else if (this.state.localSelectedTile === tileId) {
       // same tile clicked - clear selection
-      console.log('Selection cleared');
-      this.setState({
-        localSelectedTile: null,
-        localSelectedSet: null,
-      });
-    } else if (this.state.localSelectedSet === null) {
+      this.selectTile(null, null);
+    } 
+    else if (this.state.localSelectedTile !== null && this.state.localSelectedSet === null) {
       // another tile on rack clicked - swap them
-      const racks = this.swapRackTiles(tileId, this.state.localSelectedTile);
-      this.setState({
-        racks: racks,
-        localSelectedTile: null,
-        localSelectedSet: null,
-      });
-    } else {
-      // tile already selected - treat as if parent Rack element was clicked
-      this.handleClickRack();
+      //this.swapRackTiles(this.state.localSelectedTile, tileId)
+      this.moveTileWithinRack(this.state.localSelectedTile, tileId);
+    } 
+    else if (this.state.localSelectedTile !== null && this.state.localSelectedSet !== null) {
+      this.moveTileFromSetToRack(this.state.localSelectedTile, this.state.localSelectedSet, tileId);
     }
   }
 
   handleClickRack() {
-    if (this.state.localSelectedTile === null) {
+    //do nothing
+    /*if (this.state.localSelectedTile === null) {
       // no tile selected - ignore click on rack
       return;
     }
@@ -135,7 +140,7 @@ class Game extends React.Component {
       return;
     }
 
-    console.log('Rack clicked');
+    this.logDebug('Rack clicked');
 
     let sets = this.removeTileFromSet(this.state.localSelectedTile, this.state.localSelectedSet);
     let racks = this.addTileToRack(this.state.localSelectedTile);
@@ -145,107 +150,112 @@ class Game extends React.Component {
       racks: racks,
       localSelectedTile: null,
       localSelectedSet: null,
-    });
+    });*/
   }
 
-  handleClickBoardTile(tileId, setId) {
+  handleClickSetTile(tileId, setId) {
     if (this.state.localSelectedTile === tileId) {
       // same tile clicked - clear selection
-      console.log('Selection cleared');
-      this.setState({
-        localSelectedTile: null,
-        localSelectedSet: null,
-      });
-    } else if (this.state.localSelectedSet === setId) {
+      this.selectTile(null, null);
+    } 
+    else if (this.state.localSelectedSet === setId) {
       // same set as selected - select that new tile instead
-      console.log('Tile ID = ' + tileId + ' selected in Set ID = ' + setId);
-      this.setState({
-        localSelectedTile: tileId,
-        localSelectedSet: setId,
-      });
-    } else if (this.state.localSelectedTile !== null) {
-      // tile already selected - treat as if parent Set element was clicked
+      this.selectTile(tileId, setId);
+    } 
+    else if (this.state.localSelectedTile !== null) {
+      // different set than selected - treat as if parent Set element was clicked
       this.handleClickSet(setId);
-    } else  {
-      // clicked tile 
-      console.log('Tile ID = ' + tileId + ' selected in Set ID = ' + setId);
-
-      this.setState({
-        localSelectedTile: tileId,
-        localSelectedSet: setId,
-      });
-    }  
+    }
+    else if (tileId >= 0 && setId >= 0) {
+      // select tile 
+      this.selectTile(tileId, setId);
+    }
   }
 
   handleClickSet(setId) {
     if (this.state.localSelectedTile === null) {
-      // no tile selected - ignore click on set
+      this.logDebug('Ignored click on Set ID ' + setId + ' - no tile selected');
       return;
     }
     
     if (this.state.localSelectedSet === setId) {
-      // same set as selected tile - ignore click on set
+      this.logDebug('Ignored click on Set ID ' + setId + ' - same set as selected tile');
       return;
     }
 
-    console.log('Set ID = ' + setId + ' clicked');
+    this.logDebug('Set ID ' + setId + ' clicked');
 
-    if (this.state.localSelectedSet === null)
-    {
-      const racks = this.removeTileFromRack(this.state.localSelectedTile);
-      const sets = this.addTileToSet(this.state.localSelectedTile, setId);
-      
-      this.setState({
-        sets: sets,
-        racks: racks,
-        localSelectedTile: null,
-        localSelectedSet: null,
-      });
-    } else {
-      console.log('TODO: NEED TO IMPLEMENT SET TO SET MOVES!');
-      /*
-      //TODO: const sets = this.removeTileFromSet(this.state.localSelectedTile, );
-      //TODO: const sets = this.addTileToSet(this.state.localSelectedTile, setId);
-      
-      this.setState({
-        sets: sets,
-        localSelectedTile: null,
-        localSelectedSet: null,
-      });
-      */
+    if (this.state.localSelectedSet === null) {
+      this.moveTileFromRackToSet(this.state.localSelectedTile, setId);
+    } 
+    else {
+      this.moveTileFromSetToSet(this.state.localSelectedTile, this.state.localSelectedSet, setId);
     }
-
-    
   }
 
-
-  /*
+ /*
     select scenarios:
     
-      Rack.Tile
-      Set.Tile
+      Rack.Tile (selectTile)
+      Set.Tile (selectTile)
 
     move scenarios:
 
-      Click self (deselect)
+      Click self (deselect - selectTile)
 
-      Rack.Tile > Rack.Tile (swapRackTiles)
+      Rack.Tile > Rack.Tile (moveTileWithinRack)
       Rack.Tile > Rack (nothing)
       Rack.Tile > Set.Tile (invoke following)
-      Rack.Tile > Set (removeRackTile + AddSetTile)
+      Rack.Tile > Set (moveTileFromRackToSet)
       
-      Set.Tile > Rack.Tile (removeSetTile + addRackTile)
+      Set.Tile > Rack.Tile (moveTileFromSetToRack)
       Set.Tile > Rack (nothing)
 
       Set.Tile > Set.Tile - same set (nothing)
       Set.Tile > Set - same set (nothing)
       Set.Tile > Set.Tile - different set (invoke following)
-      Set.Tile > Set - different set (removeSetTile + addSetTile)
+      Set.Tile > Set - different set (moveTileFromSetToSet)
     
-*/
+  */
+
+  /********** METHODS TO MOVE TILES FROM ONE LOCATION TO ANOTHER **********/
+
+  selectTile(tileId, setId) {
+    if (setId !== null) {
+      this.logDebug('Selected Tile ID ' + tileId + ' in Set ID ' + setId);
+    } 
+    else {
+      if (tileId !== null) {
+        this.logDebug('Selected Tile ID ' + tileId +  ' in Rack');
+      } 
+      else {
+        this.logDebug('Selection cleared');
+      }
+    }
+    this.setState({
+      latestMovedTile: null,
+      localSelectedTile: tileId,
+      localSelectedSet: setId,
+    });
+    
+  }
+
+  moveTileWithinRack(tileId, targetTileId) {
+    this.logDebug('Moving Tile ID ' + tileId + ' to location ' + targetTileId + ' in Rack');
+    
+    let racks = this.removeTileFromRack(tileId);
+    racks = this.addTileToRack(tileId, targetTileId, racks);
+    
+    this.setState({
+      racks: racks,
+      latestMovedTile: tileId,
+      localSelectedTile: null,
+      localSelectedSet: null,
+    });
+  } 
 
   swapRackTiles(tileId1, tileId2) {
-    console.log('Swapping Tile IDs = ' + tileId1 + ' and ' + tileId2 + ' on Rack');
+    this.logDebug('Swapping Tile ID ' + tileId1 + ' and Tile ID ' + tileId2 + ' in Rack');
     const racks = this.state.racks.slice();
     const localRack = racks[this.state.localPlayer].slice();
     
@@ -255,58 +265,152 @@ class Game extends React.Component {
     localRack[index2] = tileId1;
     
     racks[this.state.localPlayer] = localRack;
-    return racks;
+    
+    this.setState({
+      racks: racks,
+      latestMovedTile: tileId1,
+      localSelectedTile: null,
+      localSelectedSet: null,
+    });
+  }
+
+  moveTileFromRackToSet(tileId, setId) {
+    const racks = this.removeTileFromRack(tileId);
+    const sets = this.addTileToSet(tileId, setId);
+    this.setState({
+      sets: sets,
+      racks: racks,
+      latestMovedTile: tileId,
+      localSelectedTile: null,
+      localSelectedSet: null,
+    });
+  }
+
+  moveTileFromSetToRack(tileId, setId, targetTileId) {
+    
+    // tile in set selected - can we move to rack?
+    
+    const sets = this.removeTileFromSet(tileId, setId);
+    const racks = this.addTileToRack(tileId, targetTileId, null);
+  
+    this.setState({
+      sets: sets,
+      racks: racks,
+      latestMovedTile: tileId,
+      localSelectedTile: null,
+      localSelectedSet: null,
+    });
+  }
+
+  moveTileFromSetToSet(tileId, setId, targetSetId) {
+    this.logDebug('Moving Tile ID ' + tileId + ' from Set ID ' + setId + ' to Set ID ' + targetSetId);
+    
+    let sets = this.removeTileFromSet(this.state.localSelectedTile, setId);
+    sets = this.addTileToSet(this.state.localSelectedTile, targetSetId, sets);
+    
+    this.setState({
+      sets: sets,
+      latestMovedTile: tileId,
+      localSelectedTile: null,
+      localSelectedSet: null,
+    });
+    
   }
 
   removeTileFromRack(tileId) {
-    console.log('Removing Tile ID = ' + tileId + ' from Rack');
+    this.logDebug('Removing Tile ID ' + tileId + ' from Rack');
     const racks = this.state.racks.slice();
     const localRack = racks[this.state.localPlayer].slice();
-    // don't actually remove, convert to an empty (negative) tile so we can keep track of original position
-    localRack[localRack.indexOf(this.state.localSelectedTile)] = -this.state.localSelectedTile;
+    // don't actually remove, convert to an empty tile (id = unique negative number)
+    const nextId = Math.min(...localRack, 0) - 1;
+    this.logDebug(' ...next id: ' + nextId);
+    localRack[localRack.indexOf(tileId)] = nextId;
     racks[this.state.localPlayer] = localRack;
 
     return racks;
   }
 
-  addTileToRack(tileId) {
-    console.log('Adding Tile ID = ' + tileId + ' to Rack');
-    const racks = this.state.racks.slice();
+  addTileToRack(tileId, targetPositionId, racks) {
+    this.logDebug('Adding Tile ID ' + tileId + ' to Rack at position ' + targetPositionId);
+    
+    if (!racks) {
+      racks = this.state.racks.slice();
+    }
     const localRack = racks[this.state.localPlayer].slice();
     
-    // check if matching blank tile on rack, if so place tile in that position
-    const index = localRack.indexOf(-tileId);
-    if (index >= 0) {
-      localRack[index] = tileId;
-    } else {
-      localRack.push(tileId);
+    // Find the closest empty space to targetTileId
+    const targetIndex = localRack.indexOf(targetPositionId);
+    let i = targetIndex;
+    let j = targetIndex + 1;
+    let gapFoundIndex = null;
+    while (i >= 0 || j < localRack.length) {
+      if (i >= 0 && localRack[i] < 0) {
+        gapFoundIndex = i;
+        break;
+      }
+      i--;
+      if (j < localRack.length && localRack[j] < 0) {
+        gapFoundIndex = j;
+        break;
+      }
+      j++;
     }
-    racks[this.state.localPlayer] = localRack;
+    if (gapFoundIndex === null) {
+      //rack full - no gaps. Need to shift right and increase rack size by 1
+      gapFoundIndex = j;
+    }
+    this.logDebug('targetIndex: ' + targetIndex + '  gapFoundIndex: ' + gapFoundIndex);
 
+    // Shift tiles into gap to make way for new tile
+    if (gapFoundIndex >= targetIndex) {
+      //shift right
+      for (let i = gapFoundIndex; i > targetIndex; i--) {
+        localRack[i] = localRack[i-1];
+      }
+    }
+    else {
+      //shift left
+      for (let i = gapFoundIndex; i < targetIndex; i++) {
+        localRack[i] = localRack[i+1];
+      }
+    }
+    
+    // place new tile
+    localRack[targetIndex] = tileId;
+
+    racks[this.state.localPlayer] = localRack;
     return racks;
   }
 
   removeTileFromSet(tileId, setId) {
-    console.log('TODO: NEED TO FIX REMOVE FROM SET METHOD!');
-    console.log('Removing Tile ID = ' + tileId + ' from Set ID = ' + setId);
+    this.logDebug('Removing Tile ID ' + tileId + ' from Set ID ' + setId);
     const sets = this.state.sets.slice();
     const sourceSet = sets[setId].slice();
     
     const index = sourceSet.indexOf(tileId);
-    console.log('  index = ' + index);
-    const splicedSet = sourceSet.splice(index, 1);
-    sets[setId] = splicedSet;
-
+    this.logDebug(' ...removing index ' + index);
+    sourceSet.splice(index, 1);
+    
+    if (sourceSet.length > 0) {
+      sets[setId] = sourceSet;
+    }
+    else {
+      this.logDebug(' ...removing Set ID ' + setId + ' because it is now empty');
+      sets.splice(setId, 1);
+    }
     return sets;
   }
     
-  addTileToSet(tileId, setId) {
-    console.log('Adding Tile ID = ' + tileId + ' to Set ID = ' + setId)
-    let sets;
-    if (!this.state.sets) { 
-      sets = []; 
-    } else {
-      sets = this.state.sets.slice();
+  addTileToSet(tileId, setId, sets) {
+    this.logDebug('Adding Tile ID ' + tileId + ' to Set ID ' + setId)
+    
+    if (!sets) {
+      if (!this.state.sets) { 
+        sets = []; 
+      } 
+      else {
+        sets = this.state.sets.slice();
+      }
     }
     
     if (setId < 0) {
@@ -315,13 +419,16 @@ class Game extends React.Component {
       targetSet.push(tileId);
       sets.push(targetSet);
       return sets;
-    } else {
+    } 
+    else {
       const targetSet = sets[setId].slice();
       targetSet.push(tileId);
       sets[setId] = targetSet;
       return sets;
     }
   }
+
+
 
   /********** METHODS EXECUTED DURING RENDER **********/
 
@@ -349,10 +456,10 @@ class Game extends React.Component {
       // tile selected - putting down
 
       if ((rackId !== null ) 
-        && ((this.state.localSelectedSet === null)
-        || (this.state.racks[rackId].indexOf(-tileId) >= 0))) {
+        && (this.state.localSelectedSet === null)) {
+        //&& (this.state.commitedState.racks[this.state.localPlayer].indexOf(this.state.localSelectedTile)) >= 0) {
         //can put down on rack anywhere, as long as tile picked up from rack or
-        //originated from rack (matches a negative numbered empty tile)
+        //originated from rack at start of turn
         return true;
       }
       else if (setId !== null && tileId === null && setId !== this.state.localSelectedSet) {
@@ -478,7 +585,7 @@ class Game extends React.Component {
             key={r}  
             player={this.state.players[r].name}
             tiles={this.getTilesRack(r)}
-            onClick={(tileId) => this.handleClickRackTile(tileId)}
+            onClick={(r === this.state.localPlayer) ? (tileId) => this.handleClickRackTile(tileId) : null}
           />
         )
       }
@@ -489,7 +596,7 @@ class Game extends React.Component {
         <button onClick={() => this.resetGame()}>Reset</button>
         <Board 
           sets={this.getSets()}
-          onClickTile={(tileId, setId) => this.handleClickBoardTile(tileId, setId)}
+          onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
         {racks}
@@ -515,5 +622,9 @@ function shuffle(a) {
   }
   return a;
 }
+
+
+
+
 
 export default Game;
