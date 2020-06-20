@@ -21,6 +21,10 @@ class Tile extends React.Component {
       className += ' tile-clickable'
     }
 
+    if (this.props.justMoved) {
+      className += ' tile-moved'
+    }
+
     return className;
   }
 

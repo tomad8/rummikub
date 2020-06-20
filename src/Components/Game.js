@@ -558,6 +558,7 @@ class Game extends React.Component {
           id: tileId, 
           selected: (tileId === selectedTile), 
           clickable: this.isClickable(tileId, s, null), 
+          justMoved: (tileId === this.state.latestMovedTile),
           debug: this.state.debugMode,
         });
       }
@@ -578,6 +579,7 @@ class Game extends React.Component {
         id: -1, 
         selected: false, 
         clickable: false, 
+        justMoved: false,
         debug: this.state.debugMode,
       });
 
@@ -611,6 +613,7 @@ class Game extends React.Component {
         id: tileId, 
         selected: selected, 
         clickable: clickable, 
+        justMoved: (tileId === this.state.latestMovedTile),
         debug: this.state.debugMode,
       });
     }
@@ -632,6 +635,7 @@ class Game extends React.Component {
         id: tileId, 
         selected: selected, 
         clickable: clickable, 
+        justMoved: false,
         debug: this.state.debugMode,
       });
     }

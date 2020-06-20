@@ -15,6 +15,7 @@ class Rack extends React.Component {
             id={i.id !== null ? i.id : uniqueId--} 
             selected={i.selected}
             clickable={i.clickable}
+            justMoved={i.justMoved}
             debug={i.debug}
             onClick={this.props.onClick ? () => this.props.onClick(i.id) : null}
           />
