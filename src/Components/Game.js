@@ -673,6 +673,7 @@ class Game extends React.Component {
 
     return (
       <div className='game'>
+        <ActionBar />
         <div className='actionbar'>
           <button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>
           <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
