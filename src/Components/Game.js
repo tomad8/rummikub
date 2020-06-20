@@ -3,6 +3,7 @@ import './Game.css';
 import * as Constants from '../Utils/constants';
 import Board from './Board';
 import Rack from './Rack';
+import ActionBar from './ActionBar';
 
 class Game extends React.Component {
   constructor(props) {
@@ -101,6 +102,19 @@ class Game extends React.Component {
 
   /********** ONCLICK HANDLERS **********/
 
+  handleClickActionButton(buttonId) {
+    this.logDebug('Clicked on button ID: ' + buttonId);
+    switch(buttonId) {
+      case 'reset':
+        this.resetGame();
+        break;
+      case 'taketile':
+        this.moveTileFromBagToRack();
+        break;
+      default:
+    }
+
+  }
 
   handleClickRackTile(tileId) {
     /*if (!this.isClickable(tileId, null, this.state.localPlayer)) {
@@ -317,6 +331,33 @@ class Game extends React.Component {
     
   }
 
+  moveTileFromBagToRack() {
+    if (this.state.tileBag.length > 0) {
+      if (this.state.racks) {
+        const bag = this.state.tileBag.slice();
+        const tileId = bag.splice(0, 1)[0];
+        
+        //const rackPosition = this.state.racks[this.state.localPlayer].length - 1;
+        this.logDebug('Moving Tile ID ' + tileId + ' from Bag to Rack');
+        
+        //const targetTileId = this.state.racks[this.state.localPlayer][rackPosition];
+        const racks = this.addTileToRack(tileId, null, null);
+      
+        this.setState({
+          tileBag: bag,
+          racks: racks,
+          latestMovedTile: tileId,
+          localSelectedTile: null,
+          localSelectedSet: null,
+        });
+      }
+    }
+    else {
+      this.logDebug('Cannot take new tile - tile bag is empty!');
+      alert('Tile bag is empty!')
+    }
+  }
+
   removeTileFromRack(tileId) {
     this.logDebug('Removing Tile ID ' + tileId + ' from Rack');
     const racks = this.state.racks.slice();
@@ -330,16 +371,22 @@ class Game extends React.Component {
     return racks;
   }
 
-  addTileToRack(tileId, targetPositionId, racks) {
-    this.logDebug('Adding Tile ID ' + tileId + ' to Rack at position ' + targetPositionId);
+  addTileToRack(tileId, targetTileId, racks) {
+    this.logDebug('Adding Tile ID ' + tileId + ' to Rack at position ' + targetTileId);
     
     if (!racks) {
       racks = this.state.racks.slice();
     }
     const localRack = racks[this.state.localPlayer].slice();
     
+    let targetIndex = localRack.indexOf(targetTileId);
+    if (targetTileId === null) {
+      // No target defined - default to last tile
+      targetIndex = localRack.length - 1;
+      // Later in this method, if rack is found to be full then will add tile at end, rather than shift existing tiles to right.
+    }
+    
     // Find the closest empty space to targetTileId
-    const targetIndex = localRack.indexOf(targetPositionId);
     let i = targetIndex;
     let j = targetIndex + 1;
     let gapFoundIndex = null;
@@ -355,23 +402,35 @@ class Game extends React.Component {
       }
       j++;
     }
+    
     if (gapFoundIndex === null) {
-      //rack full - no gaps. Need to shift right and increase rack size by 1
-      gapFoundIndex = j;
-    }
-    this.logDebug('targetIndex: ' + targetIndex + '  gapFoundIndex: ' + gapFoundIndex);
-
-    // Shift tiles into gap to make way for new tile
-    if (gapFoundIndex >= targetIndex) {
-      //shift right
-      for (let i = gapFoundIndex; i > targetIndex; i--) {
-        localRack[i] = localRack[i-1];
+      if (targetTileId === null) {
+        targetIndex = localRack.length;
+        this.logDebug(' ...rack full, no gaps. Adding new tile at end of rack at index: ' + targetIndex);
+      }
+      else {
+        gapFoundIndex = localRack.length;
+        this.logDebug(' ...rack full, no gaps. Shifting tiles right and adding new tile at index: ' + targetIndex);
       }
     }
-    else {
-      //shift left
-      for (let i = gapFoundIndex; i < targetIndex; i++) {
-        localRack[i] = localRack[i+1];
+
+    // Shift tiles (unless rack is full and we've already decided to add to a new position at end of rack)
+    if (gapFoundIndex !== null) {
+      // Shift tiles into gap to make way for new tile
+      this.logDebug(' ...targetIndex: ' + targetIndex + '  gapFoundIndex: ' + gapFoundIndex);
+      if (gapFoundIndex >= targetIndex) {
+        //shift right
+        this.logDebug(' ...shifting right' + targetIndex);
+        for (let i = gapFoundIndex; i > targetIndex; i--) {
+          localRack[i] = localRack[i-1];
+        }
+      }
+      else {
+        //shift left
+        this.logDebug(' ...shifting left' + targetIndex);
+        for (let i = gapFoundIndex; i < targetIndex; i++) {
+          localRack[i] = localRack[i+1];
+        }
       }
     }
     
@@ -473,8 +532,12 @@ class Game extends React.Component {
   }
 
   isSetValid(setId) {
-    
-    return this.state.sets[setId].length >= 3;
+    if (this.state.sets[setId].length < 3) {
+      return false;
+    }
+
+
+    return true;
 
   }
 
@@ -576,6 +639,23 @@ class Game extends React.Component {
     return tileBag;
   }
 
+  getActionBarButtons() {
+    //convert to class including tile id and state details
+    const buttons = [];
+    
+    /*buttons.push({
+      id: 'reset', 
+      label: 'Reset Game', 
+    });*/
+
+    buttons.push({
+      id: 'taketile', 
+      label: 'Take Tile From Bag', 
+    });
+
+    return buttons;
+  }
+
   render() {
     const racks = [];
     for (let r = 0; this.state.racks && r < this.state.racks.length; r++) {
@@ -593,14 +673,16 @@ class Game extends React.Component {
 
     return (
       <div className='game'>
-        <button onClick={() => this.resetGame()}>Reset</button>
+        <div className='actionbar'>
+          <button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>
+          <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
+        </div>
         <Board 
           sets={this.getSets()}
           onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
         {racks}
-
         <Rack 
           player='Tile Bag'
           tiles={this.getTileBag()}

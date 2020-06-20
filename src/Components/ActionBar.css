@@ -1,0 +1,38 @@
+
+
+  .actionbar {
+    background: none;
+    /*border: 1px solid #999;*/
+    /*border-radius: 5px;*/
+    float: left;
+    margin: 0px;
+    padding: 0px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .actionbutton {
+    background: rgb(135, 206, 235);
+    border: 1px solid rgb(77, 123, 143);
+    border-radius: 3px;
+    font-size: 14px;
+    /*font-weight: bold;*/
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .actionbutton:hover {
+    background: rgb(113, 178, 204);
+  }
+
+  .actionbutton:active {
+    background: rgb(77, 123, 143);
+  }
+  .actionbutton:focus {
+    outline: none;
+  }
