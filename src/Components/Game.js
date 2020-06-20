@@ -370,7 +370,11 @@ class Game extends React.Component {
     const racks = this.state.racks.slice();
     const localRack = racks[this.state.localPlayer].slice();
     // don't actually remove, convert to an empty tile (id = unique negative number)
-    const nextId = Math.min(...localRack, 0) - 1;
+    //const nextId = Math.min(...localRack, 0) - 1;
+    let nextId = -1;
+    while (localRack.indexOf(nextId) >= 0) {
+      nextId--
+    }
     this.logDebug(' ...next id: ' + nextId);
     localRack[localRack.indexOf(tileId)] = nextId;
     racks[this.state.localPlayer] = localRack;
