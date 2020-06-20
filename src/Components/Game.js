@@ -78,6 +78,13 @@ class Game extends React.Component {
     const racks = [];
     for (let i = 0; i < Constants.NUMBER_OF_PLAYERS; i++) {
       const rack = tiles.splice(0, Constants.NUMBER_OF_INITIAL_RACK_TILES);
+      
+      // Fill remainder of rack with empty spaces up to the initial maximum (default 24)
+      let j = -1;
+      for (let i = rack.length; i < Constants.NUMBER_OF_RACK_SPACES; i++) {
+        rack.push(j--);
+      }
+
       racks.push(rack);
     }
     

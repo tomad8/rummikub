@@ -11,10 +11,10 @@ export const NUMBER_OF_INITIAL_RACK_TILES = 14; // Official rules: 14
 export const MIN_SCORE_FOR_FIRST_TURN = 1;      // Official rules: 30
 export const ALLOW_ALTER_BOARD_ON_FIRST_TURN = true; // Official rules: false
 
+export const NUMBER_OF_RACK_SPACES = 24;
+
 // Used in Tile.js
 export const JOKER_DISPLAY_CHARACTER = '㋡';
 
-// Used in Rack.js
-export const NUMBER_OF_RACK_SPACES = 24;
 
 
