@@ -3,10 +3,17 @@ import React from 'react';
 import './App.css';
 import Game from './Components/Game';
 
+
 function App() {
+  let debugMode = false;
+  if (process.env.NODE_ENV !== 'production') {
+    debugMode = true;
+  }
   return (
     <div className="app">
-      <Game />
+      <Game 
+        debugMode={debugMode}
+        />
     </div>
   );
 }

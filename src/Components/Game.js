@@ -40,7 +40,7 @@ class Game extends React.Component {
       localPlayer: 0,
       localSelectedTile: null,
       localSelectedSet: null,
-      debugMode: true,
+      debugMode: this.props.debugMode,
     };
   }
   
