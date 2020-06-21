@@ -453,26 +453,27 @@ class Game extends React.Component {
   }
 
   removeTileFromSet(tileId, setId) {
-    this.logDebug('Removing Tile ID ' + tileId + ' from Set ID ' + setId);
     const sets = this.state.sets.slice();
-    const sourceSet = sets[setId].slice();
+    const setIndex = sets.findIndex(a => a.id === setId);
+    const sourceSetTiles = sets[setIndex].tiles.slice();
+    this.logDebug('Removing Tile ID ' + tileId + ' from Set ID ' + setId+ ' (index ' + setIndex + ')');
     
-    const index = sourceSet.indexOf(tileId);
-    this.logDebug(' ...removing index ' + index);
-    sourceSet.splice(index, 1);
+    const tileIndex = sourceSetTiles.indexOf(tileId);
+    this.logDebug(' ...removing tile index ' + tileIndex);
+    sourceSetTiles.splice(tileIndex, 1);
     
-    if (sourceSet.length > 0) {
-      sets[setId] = sourceSet;
+    if (sourceSetTiles.length > 0) {
+      sets[setIndex] = {id: setId, tiles: sourceSetTiles};
     }
     else {
-      this.logDebug(' ...removing Set ID ' + setId + ' because it is now empty');
-      sets.splice(setId, 1);
+      this.logDebug(' ...removing Set ID ' + setId + ' (index ' + setIndex + ') because it is now empty');
+      sets.splice(setIndex, 1);
     }
     return sets;
   }
     
   addTileToSet(tileId, setId, sets) {
-    this.logDebug('Adding Tile ID ' + tileId + ' to Set ID ' + setId)
+    this.logDebug('Adding Tile ID ' + tileId + ' to Set ID ' + setId);
     
     if (!sets) {
       if (!this.state.sets) { 
@@ -485,15 +486,19 @@ class Game extends React.Component {
     
     if (setId < 0) {
       // brand new set - create it
-      const targetSet = [];
-      targetSet.push(tileId);
-      sets.push(targetSet);
+      const targetSetTiles = [];
+      targetSetTiles.push(tileId);
+      const newSetId = Math.max(...sets.map(a => a.id), 0) + 1;
+      this.logDebug(' ... creating new Set ID ' + newSetId);
+      sets.push({id: newSetId, tiles: targetSetTiles});
       return sets;
     } 
     else {
-      const targetSet = sets[setId].slice();
-      targetSet.push(tileId);
-      sets[setId] = targetSet;
+      const setIndex = sets.findIndex(a => a.id === setId);
+      this.logDebug(' ... adding to existing Set ID ' + setId + ' (index ' + setIndex + ')');
+      const targetSetTiles = sets[setIndex].tiles.slice();
+      targetSetTiles.push(tileId);
+      sets[setIndex] = {id: setId, tiles: targetSetTiles};
       return sets;
     }
   }
@@ -543,7 +548,7 @@ class Game extends React.Component {
   }
 
   isSetValid(setId) {
-    if (this.state.sets[setId].length < 3) {
+    if (this.state.sets.find(a => (a.id === setId)).length < 3) {
       return false;
     }
 
@@ -560,25 +565,24 @@ class Game extends React.Component {
     const sets = [];
 
     const selectedTile = this.state.localSelectedTile;
-    let s;
-    for (s = 0; s < this.state.sets.length; s++) {
+    for (const set of this.state.sets) {
       //convert to class including tile id and state details
       const setTiles = [];
-      for (let tileId of this.state.sets[s]) {
+      for (const tileId of set.tiles) {
         setTiles.push({
           id: tileId, 
           selected: (tileId === selectedTile), 
-          clickable: this.isClickable(tileId, s, null), 
+          clickable: this.isClickable(tileId, set.id, null), 
           justMoved: (tileId === this.state.latestMovedTile),
           debug: this.state.debugMode,
         });
       }
       setTiles.sort((a, b) => a.id - b.id);
       sets.push({
-        id: s, 
+        id: set.id, 
         tiles: setTiles, 
-        clickable: this.isClickable(null, s, null),
-        valid: this.isSetValid(s),
+        clickable: this.isClickable(null, set.id, null),
+        valid: this.isSetValid(set.id),
       });
     }
 
@@ -685,7 +689,17 @@ class Game extends React.Component {
         )
       }
     }
-
+    if (this.state.debugMode) {
+      // Show the tile bag
+      racks.push(
+        <Rack 
+          key={-1}  
+          player='Tile Bag'
+          tiles={this.getTileBag()}
+        />
+      )
+    }
+    
     return (
       <div className='game'>
         <ActionBar />
@@ -699,10 +713,6 @@ class Game extends React.Component {
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
         {racks}
-        <Rack 
-          player='Tile Bag'
-          tiles={this.getTileBag()}
-        />
       </div>
     );
   }

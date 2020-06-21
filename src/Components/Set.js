@@ -41,6 +41,14 @@ class Set extends React.Component {
       }
     }
     
+    if (this.props.debug) {
+      tiles.push(
+        <div key={-1} className='set-subscript'>
+          {'Set ' + this.props.id}
+        </div>
+      )
+    }
+
     return (
       <div
         className={this.getSetClassName(this.props.id)}

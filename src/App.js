@@ -7,7 +7,7 @@ import Game from './Components/Game';
 function App() {
   let debugMode = false;
   if (process.env.NODE_ENV !== 'production') {
-    debugMode = true;
+    debugMode = false;
   }
   return (
     <div className="app">

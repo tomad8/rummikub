@@ -59,8 +59,8 @@ class Tile extends React.Component {
         <div className={this.getTextClassName(this.props.id)}>
           {this.getText(this.props.id)}
         </div>
-        <div className='tile-subscript'>
-          {this.props.debug ? this.props.id : ''}
+        <div className={this.props.debug ? 'tile-subscript-debug' : (this.props.id >= 0 ? 'tile-subscript' : 'tile-subscript-empty')}>
+          {this.props.debug ? this.props.id : Constants.JOKER_DISPLAY_CHARACTER}
         </div>
       </button>
     );

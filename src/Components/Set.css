@@ -33,11 +33,19 @@
 
   .set-invalid {
     border: 1px solid rgba(255, 0, 0, 1);
-    background: rgba(255, 0, 0, 0.4);
+    background: rgba(255, 0, 0, 0.3);
   }
 
   .set-empty {
     border: 1px solid #eee;
     background: #eee;
     background-image: none;
+  }
+
+  .set-subscript {
+    border: none;
+    font-size: 10px;
+    line-height: 10px;
+    color: gray;
+    padding: 0;
   }
