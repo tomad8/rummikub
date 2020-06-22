@@ -1,3 +1,11 @@
+# Rummi-Hub
+
+An online version of the popular game [Rummikub](https://en.wikipedia.org/wiki/Rummikub) built using [React](https://reactjs.org/) 
+
+Work in progress... :)
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
