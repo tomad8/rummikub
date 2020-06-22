@@ -879,6 +879,9 @@ class Game extends React.Component {
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
         {racks}
+        
+        <div className='note'><strong>Rummikub POC notes:</strong> set validation and scoring now working for runs of same colour (including handling jokers!) but not yet working for groups of same number</div>
+        
       </div>
     );
   }

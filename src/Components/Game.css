@@ -9,4 +9,11 @@
     align-items: center;
   }
 
+  .note {
+    text-align: center;
+    font-size: 12px;
+    line-height: 12px;
+    color: gray;
+  }
+
   
