@@ -1,5 +1,6 @@
 import React from 'react';
 import './Game.css';
+import * as Utils from '../Utils';
 import * as Constants from '../Utils/constants';
 import * as TileHelper from '../Utils/tilehelper';
 import Board from './Board';
@@ -73,7 +74,7 @@ class Game extends React.Component {
       tiles.push(i);
     }
 
-    shuffle(tiles);
+    Utils.shuffle(tiles);
 
     // Deal tiles to players
     const racks = [];
@@ -591,7 +592,7 @@ class Game extends React.Component {
             break; //not a run - different colour
           }
           tileRank = TileHelper.getTileRankFromId(t[i]);
-          if (tileRank !== previousTileRank + 1) {
+          if (tileRank !== previousTileRank + 1 && tileRank !== previousTileRank) {
             //run broken - see how many jokers we would need to fill this gap
             let gap = tileRank - previousTileRank - 1;
             jokersAvailable -= gap;
@@ -618,41 +619,11 @@ class Game extends React.Component {
   }
 
 
-  getSetScore(tiles) {
-    // This method assumes set has been sorted by sortSet()
-    // Don't need to call it again here as long as already sorted.
-    //tiles = sortSet(tiles);
-    
-    
+  // Check for RUN in single colour (suit)
+  getSetScoreRun(t) {
     let score = 0;
-    const t = tiles;
-
-    if (t.length < 3) {
-      return 0;
-    }
-    else if (t.length > Constants.NUMBER_OF_TILE_RANKS) {
-      return 0;
-    }
-    
-    // all-joker scenarios
-    const jokerCount = t.filter(a => TileHelper.isJoker(a)).length;
-    if (jokerCount === t.length) {
-      if (t.length <= Constants.NUMBER_OF_TILE_SUITS) {
-        // max score group
-        return t.length * Constants.NUMBER_OF_TILE_RANKS;
-      }
-      else {
-        // max score run
-        let tileRank = Constants.NUMBER_OF_TILE_RANKS;
-        for (let i = 0; i < t.length; i++) {
-          score += tileRank - i;
-        }
-      }
-    }
-
-    // check for run in single colour
     let isValidRun = true;
-    
+      
     let firstTileColour = null;
     for (let i = 0; i < t.length; i++) {
       if (!TileHelper.isJoker(t[i])) {
@@ -660,7 +631,7 @@ class Game extends React.Component {
           firstTileColour = TileHelper.getTileSuitFromId(t[i]);
         }
         else if (TileHelper.getTileSuitFromId(t[i]) !== firstTileColour) {
-          isValidRun = false;
+          isValidRun = false; //colour mismatch
           break;
         }
       }
@@ -706,15 +677,102 @@ class Game extends React.Component {
       }
     }
     
-    if (isValidRun) {
-      return score;
+    if (!isValidRun) {
+      score = 0;
+    }
+    return score;
+  }
+
+  // Check for GROUP in single number (rank)
+  getSetScoreGroup(t) {
+    let isValidGroup = true;
+    
+    if (t.length > Constants.NUMBER_OF_TILE_SUITS && !Constants.ALLOW_DUPLICATE_SUITS_IN_GROUP) {
+      return 0;
     }
 
-    // TODO: check for run in single colour
-    
+    let firstTileRank = null;
+    let suits = [];
+    for (let i = 0; i < t.length; i++) {
+      if (!TileHelper.isJoker(t[i])) {
+        let tileRank = TileHelper.getTileRankFromId(t[i]);
+        if (firstTileRank === null) {
+          firstTileRank = tileRank;
+        }
+        else if (tileRank !== firstTileRank) {
+          isValidGroup = false; //rank mismatch
+          break;
+        }
+        if (!Constants.ALLOW_DUPLICATE_SUITS_IN_GROUP) {
+          let tileColour = TileHelper.getTileSuitFromId(t[i]);
+          if (suits[tileColour] === undefined) {
+            suits[tileColour] = i;
+          }
+          else {
+            isValidGroup = false; //more than one duplicate tile of same suit (colour)
+            break;
+          }
+        }
+      }
+    }
 
+    if (isValidGroup) {
+      return firstTileRank * t.length;
+    }
     return 0;
   }
+
+  getSetScore(tiles) {
+    // This method assumes set has been sorted by sortSet()
+    // Don't need to call it again here as long as already sorted.
+    //tiles = sortSet(tiles);
+    
+    
+    let score = 0;
+    const t = tiles;
+
+    if (t.length < Constants.MIN_TILES_IN_SET) {
+      return 0;
+    }
+    else if (t.length > Constants.NUMBER_OF_TILE_RANKS) {
+      return 0;
+    }
+    
+    // all-joker scenarios
+    const jokerCount = t.filter(a => TileHelper.isJoker(a)).length;
+    if (jokerCount === t.length) {
+      if (t.length <= Constants.NUMBER_OF_TILE_SUITS) {
+        // max score group
+        return t.length * Constants.NUMBER_OF_TILE_RANKS;
+      }
+      else {
+        // max score run
+        let tileRank = Constants.NUMBER_OF_TILE_RANKS;
+        for (let i = 0; i < t.length; i++) {
+          score += tileRank - i;
+        }
+        return score;
+      }
+    }
+
+    // Check for RUN in single colour (suit)
+    const scoreRun = this.getSetScoreRun(t);
+    
+    // If valid RUN then just return that score.
+    // UNLESS jokers + ONE normal tile, then must also calc for GROUP and take highest score
+    // because it could be either.
+    if ((scoreRun > 0) && (jokerCount !== t.length - 1)) {
+      return scoreRun;
+    }
+
+    // Check for GROUP in single number (rank)
+    const scoreGroup = this.getSetScoreGroup(t);
+    
+    return (scoreGroup > scoreRun) ? scoreGroup : scoreRun;
+  }
+
+
+
 
   getSets() {
     if (!this.state.sets) {
@@ -865,6 +923,9 @@ class Game extends React.Component {
       )
     }
     
+    const availableTiles = TileHelper.getTotalTileCount() - (Constants.NUMBER_OF_PLAYERS - 1) * Constants.NUMBER_OF_INITIAL_RACK_TILES;
+    const tilesInBag = this.state.tileBag.length;
+
     return (
       <div className='game'>
         <ActionBar />
@@ -880,28 +941,25 @@ class Game extends React.Component {
         />
         {racks}
         
-        <div className='note'><strong>Rummikub POC notes:</strong> set validation and scoring now working for runs of same colour (including handling jokers!) but not yet working for groups of same number</div>
-        
+        <div className='note'>
+          <strong>Rummikub POC</strong><br/>
+          Set validation and scoring are now working for runs of same colour and groups of same number (including jokers!)
+          See if you can make valid sets and clear your rack <strong>㋡</strong>
+          </div>
+        <div className='note'>
+          <strong>Game Parameters</strong><br/>
+          Decks: {Constants.NUMBER_OF_TILE_DECKS} •
+          Colours (suits): {Constants.NUMBER_OF_TILE_SUITS} •
+          Numbers (ranks): {Constants.NUMBER_OF_TILE_RANKS} • 
+          Jokers: {Constants.NUMBER_OF_TILE_JOKERS} •
+          Total tiles: {TileHelper.getTotalTileCount()} •
+          Tiles in play: {availableTiles - tilesInBag} •
+          Tiles in bag: {tilesInBag}
+        </div>
       </div>
     );
   }
 }
-
-
-// Implementation of Fisher–Yates shuffle to randomise an array
-function shuffle(a) {
-  var i, j, x;
-  for (i = a.length - 1; i > 0; i--) {
-      j = Math.floor(Math.random() * (i + 1));
-      x = a[i];
-      a[i] = a[j];
-      a[j] = x;
-  }
-  return a;
-}
-
-
-
 
 
 export default Game;

@@ -7,7 +7,7 @@ import * as Constants from '../Utils/constants';
 
 
   export function getTotalTileCount() {
-    return getStandardTileCount() * Constants.NUMBER_OF_TILE_JOKERS;
+    return getStandardTileCount() + Constants.NUMBER_OF_TILE_JOKERS;
   }
 
 
