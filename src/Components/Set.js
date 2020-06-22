@@ -43,8 +43,14 @@ class Set extends React.Component {
     
     if (this.props.debug) {
       tiles.push(
-        <div key={-1} className='set-subscript'>
-          {'Set ' + this.props.id}
+        <div key={-2} className='set-subscript'>
+          {(this.props.score > 0 ? this.props.score + ' points - ' : '') + 'Set ' + this.props.id}
+        </div>
+      )
+    } else {
+      tiles.push(
+        <div key={-2} className='set-subscript'>
+          {(this.props.score > 0 ? this.props.score + ' points' : '')}
         </div>
       )
     }

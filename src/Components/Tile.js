@@ -1,5 +1,6 @@
 import React from 'react';
 import * as Constants from '../Utils/constants';
+import * as TileHelper from '../Utils/tilehelper';
 import './Tile.css';
 
 class Tile extends React.Component {
@@ -30,9 +31,9 @@ class Tile extends React.Component {
 
   getTextClassName(id) {
     let className = 'tile-text';
-    let colourIndex = getTileSuitFromId(id);
+    let colourIndex = TileHelper.getTileSuitFromId(id);
 
-    // we only handle max 6 suits.colours here (should be plenty, default is 4)
+    // we only handle max 6 suits/colours here (should be plenty, default is 4)
     switch (colourIndex) {
       case 0: className += ' tile-black'; break;
       case 1: className += ' tile-red'; break;
@@ -47,7 +48,7 @@ class Tile extends React.Component {
   }
   
   getText(id) {    
-    return getTileRankFromId(id);
+    return TileHelper.getTileRankFromId(id);
   }
 
   render() {
@@ -70,47 +71,3 @@ class Tile extends React.Component {
 export default Tile;
 
 
-function getTileSuitFromId(id) {
-  const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
-  const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
-  const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
-  const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
-  const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
-  const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
-  const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
-  
-  let suit = null;
-  if (id >= 0 && id < numberOfStandardTiles) {
-    suit = Math.floor(id / numberOfDecks) % numberOfSuits;
-  } 
-  else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
-    // alternate joker colours
-    suit = id % numberOfSuits;
-  }
-
-  return suit;
-}
-
-function getTileRankFromId(id) {
-  const numberOfSuits = Constants.NUMBER_OF_TILE_SUITS;
-  const numberOfRanks = Constants.NUMBER_OF_TILE_RANKS;
-  const numberOfDecks = Constants.NUMBER_OF_TILE_DECKS;
-  const numberOfJokers = Constants.NUMBER_OF_TILE_JOKERS;
-  const numberOfTilesPerDeck = numberOfSuits * numberOfRanks;
-  const numberOfStandardTiles = numberOfTilesPerDeck * numberOfDecks;
-  const numberOfTotalTiles = numberOfStandardTiles * numberOfJokers;
-  
-    let rank = null;
-  if (id >= 0 && id < numberOfStandardTiles) {
-    rank = (Math.floor((id / numberOfDecks / numberOfSuits)) % numberOfRanks) + 1;
-  } 
-  else if (id >= numberOfStandardTiles && id < numberOfTotalTiles) {
-    rank = Constants.JOKER_DISPLAY_CHARACTER;
-  } 
-  else if (id < 0) {
-    // empty tile
-    rank = '+';
-  }
-
-  return rank;
-}

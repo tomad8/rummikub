@@ -1,6 +1,7 @@
 import React from 'react';
 import './Game.css';
 import * as Constants from '../Utils/constants';
+import * as TileHelper from '../Utils/tilehelper';
 import Board from './Board';
 import Rack from './Rack';
 import ActionBar from './ActionBar';
@@ -508,6 +509,8 @@ class Game extends React.Component {
   /********** METHODS EXECUTED DURING RENDER **********/
 
   isClickable(tileId, setId, rackId) {
+    //return false; //disable hover effect
+    
     if (rackId !== null && rackId !== this.state.localPlayer) {
       // can never click other players tiles (even in debug!)
       return false;
@@ -547,14 +550,170 @@ class Game extends React.Component {
     }
   }
 
-  isSetValid(setId) {
-    if (this.state.sets.find(a => (a.id === setId)).length < 3) {
-      return false;
+
+  sortSet(tiles) {
+    let sortedTiles = tiles.slice();
+
+    // Simple sort by ID
+    sortedTiles.sort((a, b) => a - b);
+
+    if (sortedTiles.length > Constants.NUMBER_OF_TILE_RANKS) {
+      return sortedTiles;
     }
 
+    // Handle Jokers...
+    const jokerCount = sortedTiles.filter(a => TileHelper.isJoker(a)).length;
+    let jokersAvailable = jokerCount;
+    if (jokerCount > 0) {
+      //jokers will be at end of array
 
-    return true;
+      const t = sortedTiles.slice();
 
+      // check for run in single colour
+      const firstTileColour = TileHelper.getTileSuitFromId(t[0]);
+      let previousTileRank = TileHelper.getTileRankFromId(t[0]);
+      for (let i = 1; i < t.length; i++) {
+        let tileRank;
+        if (TileHelper.isJoker(t[i])) {
+          //set assumed tileRank to one for than previous to continue run
+          tileRank = previousTileRank + 1;
+          if ((tileRank > Constants.NUMBER_OF_TILE_RANKS) && (i < Constants.NUMBER_OF_TILE_RANKS)) {
+            //if tile rank greater than maximum rank (default 13) then push joker to start of array (unless run is already maximum length)
+            const joker = t[i];
+            t.splice(i, 1); //remove at current index
+            t.splice(0, 0, joker); //insert at start
+          }
+        }
+        else {
+          //only carry out further analysis if tile is not a joker
+          if (TileHelper.getTileSuitFromId(t[i]) !== firstTileColour) {
+            jokersAvailable = -1;
+            break; //not a run - different colour
+          }
+          tileRank = TileHelper.getTileRankFromId(t[i]);
+          if (tileRank !== previousTileRank + 1) {
+            //run broken - see how many jokers we would need to fill this gap
+            let gap = tileRank - previousTileRank - 1;
+            jokersAvailable -= gap;
+            if (jokersAvailable < 0) {
+              //not enough jokers to make the run
+              break;
+            }
+            const jokers = t.splice(t.length - gap, gap); //remove jokers from end
+            t.splice(i, 0, ...jokers); //insert them at current index
+            i += gap; //skip over the jokers we just inserted
+          }
+        }
+        previousTileRank = tileRank;
+      }
+
+      // if we successfully completed a run then retain the new joker positions, else discard
+      if (true || jokersAvailable >= 0) {
+        sortedTiles = t;
+      }
+      
+    }
+
+    return sortedTiles;
+  }
+
+
+  getSetScore(tiles) {
+    // This method assumes set has been sorted by sortSet()
+    // Don't need to call it again here as long as already sorted.
+    //tiles = sortSet(tiles);
+    
+    
+    let score = 0;
+    const t = tiles;
+
+    if (t.length < 3) {
+      return 0;
+    }
+    else if (t.length > Constants.NUMBER_OF_TILE_RANKS) {
+      return 0;
+    }
+    
+    // all-joker scenarios
+    const jokerCount = t.filter(a => TileHelper.isJoker(a)).length;
+    if (jokerCount === t.length) {
+      if (t.length <= Constants.NUMBER_OF_TILE_SUITS) {
+        // max score group
+        return t.length * Constants.NUMBER_OF_TILE_RANKS;
+      }
+      else {
+        // max score run
+        let tileRank = Constants.NUMBER_OF_TILE_RANKS;
+        for (let i = 0; i < t.length; i++) {
+          score += tileRank - i;
+        }
+      }
+    }
+
+    // check for run in single colour
+    let isValidRun = true;
+    
+    let firstTileColour = null;
+    for (let i = 0; i < t.length; i++) {
+      if (!TileHelper.isJoker(t[i])) {
+        if (firstTileColour === null) {
+          firstTileColour = TileHelper.getTileSuitFromId(t[i]);
+        }
+        else if (TileHelper.getTileSuitFromId(t[i]) !== firstTileColour) {
+          isValidRun = false;
+          break;
+        }
+      }
+    }
+    
+    if (isValidRun) {
+      let previousTileRank = null;
+      for (let i = 0; i < t.length; i++) {
+        let tileRank;
+        if (TileHelper.isJoker(t[i])) {
+          if (previousTileRank === null) {
+            tileRank = null; // unknown, will backfill when first numbered tile is reached
+          }
+          else {
+            tileRank = previousTileRank + 1;
+            score += tileRank;
+            if (tileRank > Constants.NUMBER_OF_TILE_RANKS) {
+              isValidRun = false;
+              break; //run exceeded max rank
+            }
+          }
+        }
+        else {
+          tileRank = TileHelper.getTileRankFromId(t[i]);
+          if (previousTileRank === null) {
+            //backfill score for any jokers at start of run
+            let rank = tileRank;
+            for (let j = 0; j < i; j++) {
+              score += --rank;
+              if (rank < 1) {
+                isValidRun = false;
+                break; //run exceeded min rank
+              }
+            }
+          }
+          else if (tileRank !== previousTileRank + 1) {
+            isValidRun = false;
+            break; //run broken
+          }
+          score += tileRank;
+        }
+        previousTileRank = tileRank;
+      }
+    }
+    
+    if (isValidRun) {
+      return score;
+    }
+
+    // TODO: check for run in single colour
+    
+
+    return 0;
   }
 
   getSets() {
@@ -567,8 +726,11 @@ class Game extends React.Component {
     const selectedTile = this.state.localSelectedTile;
     for (const set of this.state.sets) {
       //convert to class including tile id and state details
+      const sortedTiles = this.sortSet(set.tiles);
+      
+      //map simple tileId list to setTile structure
       const setTiles = [];
-      for (const tileId of set.tiles) {
+      for (const tileId of sortedTiles) {
         setTiles.push({
           id: tileId, 
           selected: (tileId === selectedTile), 
@@ -577,12 +739,13 @@ class Game extends React.Component {
           debug: this.state.debugMode,
         });
       }
-      setTiles.sort((a, b) => a.id - b.id);
+      let score = this.getSetScore(sortedTiles);
       sets.push({
         id: set.id, 
         tiles: setTiles, 
         clickable: this.isClickable(null, set.id, null),
-        valid: this.isSetValid(set.id),
+        valid: (score > 0),
+        score: score,
       });
     }
 
@@ -603,6 +766,7 @@ class Game extends React.Component {
         tiles: setTiles, 
         clickable: (this.state.localSelectedTile !== null),
         valid: true,
+        score: null,
       });
     //}
 
@@ -684,6 +848,7 @@ class Game extends React.Component {
             key={r}  
             player={this.state.players[r].name}
             tiles={this.getTilesRack(r)}
+            debug={this.state.debugMode}
             onClick={(r === this.state.localPlayer) ? (tileId) => this.handleClickRackTile(tileId) : null}
           />
         )
@@ -709,6 +874,7 @@ class Game extends React.Component {
         </div>
         <Board 
           sets={this.getSets()}
+          debug={this.state.debugMode}
           onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
           onClickSet={(setId) => this.handleClickSet(setId)}
         />

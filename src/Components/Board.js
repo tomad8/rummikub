@@ -5,6 +5,7 @@ import Set from './Set';
 class Board extends React.Component {
   
   render() {
+    let boardScore = 0;
     const sets = [];
     if (this.props.sets) {
       for (const s of this.props.sets) {
@@ -17,17 +18,20 @@ class Board extends React.Component {
               tiles={s.tiles} 
               clickable={s.clickable}
               valid={s.valid}
+              score={s.score}
+              debug={this.props.debug}
               onClickTile={(TileId) => this.props.onClickTile(TileId, s.id)}
               onClick={() => this.props.onClickSet(s.id)}
             />
           )
+          boardScore += s.score;
         }
       }
     }
     
     return (
       <div className='board'>
-        <div>Board</div>
+        <div>Board - {boardScore} points</div>
         {sets}
       </div>
     );
