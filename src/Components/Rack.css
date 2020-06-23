@@ -3,7 +3,7 @@
   .rack {
     background: white;
     /*border: 1px solid #999;*/
-    /*border-radius: 5px;*/
+    border-radius: 3px;
     float: left;
     margin: 5px;
     padding: 5px;

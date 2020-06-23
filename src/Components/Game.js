@@ -948,13 +948,13 @@ class Game extends React.Component {
           </div>
         <div className='note'>
           <strong>Game Parameters</strong><br/>
-          Decks: {Constants.NUMBER_OF_TILE_DECKS} •
-          Colours (suits): {Constants.NUMBER_OF_TILE_SUITS} •
-          Numbers (ranks): {Constants.NUMBER_OF_TILE_RANKS} • 
-          Jokers: {Constants.NUMBER_OF_TILE_JOKERS} •
-          Total tiles: {TileHelper.getTotalTileCount()} •
-          Tiles in play: {availableTiles - tilesInBag} •
-          Tiles in bag: {tilesInBag}
+          {Constants.NUMBER_OF_TILE_DECKS} decks
+           • {Constants.NUMBER_OF_TILE_SUITS} colours (suits)
+           • {Constants.NUMBER_OF_TILE_RANKS} numbers (ranks)
+           • {Constants.NUMBER_OF_TILE_JOKERS} jokers
+           • {TileHelper.getTotalTileCount()} total tiles
+           • {availableTiles - tilesInBag} tiles in play
+           • {tilesInBag} tiles in bag
         </div>
       </div>
     );
