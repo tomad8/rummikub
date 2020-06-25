@@ -1,0 +1,24 @@
+
+
+  .rack {
+    background: white;
+    /*border: 1px solid #999;*/
+    border-radius: 3px;
+    /*float: left;*/
+    margin: 5px;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
+
+  .racktitle {
+    
+    margin: 0px;
+    padding: 5px;
+    flex-basis: 100%;
+  }

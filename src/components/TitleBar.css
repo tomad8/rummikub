@@ -1,0 +1,27 @@
+
+
+  .titlebarbg {
+    background: rgb(53, 63, 77);
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .titlebar {
+    background: rgb(53, 63, 77);
+    margin: auto;
+    max-width: 1032px;
+    padding: 5px;
+    overflow: hidden;
+  }
+
+  .title {
+    float: left;
+    margin: 0px;
+    padding: 5px;
+  }
+
+  .usermenu {
+    float: right;
+    margin: 0px;
+    padding: 5px;
+  }

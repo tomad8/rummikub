@@ -2,7 +2,18 @@
 .app {
   text-align: center;
   /*background-color: #eee;*/
+
 }
+
+a {
+  color: rgb(145, 166, 202);
+  text-decoration: none;
+}
+
+a:hover {
+  color: rgb(182, 202, 238);
+}
+
 
 .App-logo {
   height: 40vmin;

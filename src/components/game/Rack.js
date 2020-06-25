@@ -25,7 +25,7 @@ class Rack extends React.Component {
 
     return (
       <div className='rack'>
-        <div>{this.props.player}</div>
+        <div className='racktitle'>{this.props.player}</div>
         {tiles}
       </div>
     );

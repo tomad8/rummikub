@@ -4,12 +4,16 @@
     /*background: #f77;*/
     border: 1px solid #999;
     border-radius: 5px;
-    float: left;
-    margin: 10px;
+    /*float: left;*/
+    margin: 5px;
     padding: 5px;
-    align-content: center;
-    align-items: center;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
+    align-content: center;
   }
 
   .set:focus {
@@ -47,5 +51,6 @@
     font-size: 10px;
     line-height: 10px;
     color: gray;
-    padding: 0;
+    padding: 0px;
+    align-self: flex-end;
   }

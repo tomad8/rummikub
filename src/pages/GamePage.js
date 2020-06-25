@@ -1,13 +1,13 @@
 import React from 'react';
-import './Game.css';
-import * as Utils from '../Utils';
-import * as Constants from '../Utils/constants';
-import * as TileHelper from '../Utils/tilehelper';
-import Board from './Board';
-import Rack from './Rack';
-import ActionBar from './ActionBar';
+import './GamePage.css';
+import * as Utils from '../utils';
+import * as Constants from '../constants';
+import * as TileHelper from '../utils/tilehelper';
+import Board from '../components/game/Board';
+import Rack from '../components/game/Rack';
+import ActionBar from '../components/game/ActionBar';
 
-class Game extends React.Component {
+class GamePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -42,7 +42,7 @@ class Game extends React.Component {
       localPlayer: 0,
       localSelectedTile: null,
       localSelectedSet: null,
-      debugMode: this.props.debugMode,
+      debugMode: (process.env.NODE_ENV !== 'production'),
     };
   }
   
@@ -927,18 +927,19 @@ class Game extends React.Component {
     const tilesInBag = this.state.tileBag.length;
 
     return (
-      <div className='game'>
-        <ActionBar />
-        <div className='actionbar'>
-          <button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>
-          <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
-        </div>
+      <div className='gamepage'>
+        
         <Board 
           sets={this.getSets()}
           debug={this.state.debugMode}
           onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
           onClickSet={(setId) => this.handleClickSet(setId)}
         />
+        <ActionBar />
+        <div className='actionbar'>
+          <button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>
+          <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
+        </div>
         {racks}
         
         <div className='note'>
@@ -962,4 +963,4 @@ class Game extends React.Component {
 }
 
 
-export default Game;
+export default GamePage;

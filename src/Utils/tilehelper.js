@@ -1,4 +1,4 @@
-import * as Constants from '../Utils/constants';
+import * as Constants from '../constants';
 
 
   export function getStandardTileCount() {

@@ -1,12 +1,11 @@
 
 
-  .game {
+  .gamepage {
+    margin: auto;
+    max-width: 1032px;
     text-align: center;
-    display: flex;
-    flex-direction: column;
     padding: 0px;
-    align-content: center;
-    align-items: center;
+    
   }
 
   .note {

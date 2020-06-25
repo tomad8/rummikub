@@ -31,7 +31,7 @@ class Board extends React.Component {
     
     return (
       <div className='board'>
-        <div>{boardScore} points</div>
+        <div className='boardtitle'>{boardScore} points</div>
         {sets}
       </div>
     );

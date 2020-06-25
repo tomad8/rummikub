@@ -41,18 +41,19 @@ class Set extends React.Component {
       }
     }
     
+    let settitle;
     if (this.props.debug) {
-      tiles.push(
+      settitle = 
         <div key={-2} className='set-subscript'>
-          {(this.props.score > 0 ? this.props.score + ' points - ' : '') + 'Set ' + this.props.id}
-        </div>
-      )
-    } else {
-      tiles.push(
-        <div key={-2} className='set-subscript'>
+          {'Set ' + this.props.id}<br/>
           {(this.props.score > 0 ? this.props.score + ' points' : '')}
+          
         </div>
-      )
+    } else {
+      settitle = 
+        <div key={-2} className='set-subscript'>
+          {(this.props.score > 0 ? this.props.score: '')}
+        </div>
     }
 
     return (
@@ -61,6 +62,7 @@ class Set extends React.Component {
         onClick={this.props.onClick}
       >
         {tiles}
+        {settitle}
       </div>
     );
   }

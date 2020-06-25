@@ -5,12 +5,11 @@
     /*background: rgb(230, 230, 230);*/
     border: 1px solid #aaa;
     border-radius: 3px;
-    float: left;
+    /*float: left;*/
     height: 60px;
     margin: 1px;
     padding: 0px;
     width: 40px;
-    align-content: center;
     /*box-shadow: 2px 2px 3px #00000033;*/
 
     /*transition: transform 0.5s ease-out;*/

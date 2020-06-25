@@ -1,6 +1,6 @@
 import React from 'react';
-import * as Constants from '../Utils/constants';
-import * as TileHelper from '../Utils/tilehelper';
+import * as Constants from '../../constants';
+import * as TileHelper from '../../utils/tilehelper';
 import './Tile.css';
 
 class Tile extends React.Component {
