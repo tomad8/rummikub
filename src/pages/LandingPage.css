@@ -1,12 +1,59 @@
 
 
-  .landingpage {
-    margin: auto;
-    max-width: 1032px;
-    color: white;
-    text-align: center;
-    padding: 0px;
-  }
+.landingpage {
+  margin: auto;
+  max-width: 1032px;
+  color: white;
+  text-align: center;
+  padding: 0px;
+}
 
+.landingtitle {
+  color: rgb(145, 166, 202);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  font-size: 30pt;
+  text-align: center;
+  padding: 0px;
+}
+.landingtitle i {
+  color: rgb(182, 202, 238);
+  font-size: 30pt;
+  font-family: "Times New Roman", Times, serif; 
+}
 
+.landingbuttons {
+  margin: auto;
+  padding: 5px;
+}
+.landingbuttons span {
+  padding: 10px;
+  display:inline-block;
+}
+
+.bigbutton {
+  background: rgb(135, 206, 235);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 3px;
+  width: 250px;
+  height: 40px;
+  color: black;
+  font-size: 20px;
+  /*font-weight: bold;*/
+  margin: auto;
+  padding: 5px;
+  vertical-align: middle;
+  line-height: 40px;
+}
+
+.bigbutton:hover {
+  background: rgb(113, 178, 204);
+}
+
+.bigbutton:active {
+  background: rgb(77, 123, 143);
+}
+.bigbutton:focus {
+  outline: none;
+}
   

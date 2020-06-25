@@ -8,20 +8,52 @@
 
   .titlebar {
     background: rgb(53, 63, 77);
+    font-size: 12pt;
     margin: auto;
     max-width: 1032px;
-    padding: 5px;
+    padding: 2px;
     overflow: hidden;
   }
 
-  .title {
+
+  .menulink {
     float: left;
-    margin: 0px;
     padding: 5px;
+    border-radius: 5px;
   }
 
-  .usermenu {
+  .userlink {
     float: right;
-    margin: 0px;
     padding: 5px;
+    border-radius: 5px;
+  }
+
+  .menulink:hover, .userlink:hover {
+    background: rgba(182, 202, 238, 0.1);
+  }
+  
+  .menulink:active, .userlink:active {
+    background: rgba(182, 202, 238, 0.2);
+  }
+
+  .menulink img {
+    /*float: left;*/
+    padding-right: 5px;
+    vertical-align: middle;
+  }
+
+  .userlink img {
+    /*float: right;*/
+    padding-left: 5px;
+    vertical-align: middle;
+  }
+
+  .menulink span, .userlink span {
+    vertical-align: middle;
+  }
+ 
+  .menulink i {
+    color: rgb(182, 202, 238);
+    font-size: 12pt;
+    font-family: "Times New Roman", Times, serif; 
   }

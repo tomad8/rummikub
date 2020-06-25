@@ -10,7 +10,8 @@
 
   .actionbutton {
     background: rgb(135, 206, 235);
-    border: 1px solid rgb(77, 123, 143);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    border: none;
     border-radius: 3px;
     font-size: 14px;
     /*font-weight: bold;*/

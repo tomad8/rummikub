@@ -125,14 +125,7 @@ class GamePage extends React.Component {
 
   }
 
-  handleClickRackTile(tileId) {
-    /*if (!this.isClickable(tileId, null, this.state.localPlayer)) {
-      // no clicking if not clickable!
-      // This is kludge to prevent clicking other player racks in debugMode
-      return;
-    }*/
-    
-    
+  handleClickRackTile(tileId) {    
     if (this.state.localSelectedTile === null && tileId >=0) {
       // no tile selected - select this one if valid
       this.selectTile(tileId, null);
