@@ -10,10 +10,12 @@
 
   .note {
     text-align: center;
-    font-size: 12px;
-    line-height: 12px;
-    color: gray;
+    font-size: 10pt;
+    color: rgb(145, 166, 202);
     padding: 5px;
   }
-
+  .note strong {
+    color: white;
+    font-weight: normal;
+  }
   

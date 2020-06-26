@@ -4,7 +4,7 @@
     background: none;
     /*border: 1px solid #999;*/
     /*border-radius: 5px;*/
-    margin: 0px;
+    margin: auto;
     padding: 0px;
   }
 
@@ -15,8 +15,10 @@
     border-radius: 3px;
     font-size: 14px;
     /*font-weight: bold;*/
-    margin: 5px;
-    padding: 5px;
+    margin: 0px;
+    padding: 8px;
+    display:inline-block;
+    vertical-align: middle;
   }
 
   .actionbutton:hover {

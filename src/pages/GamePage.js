@@ -43,6 +43,7 @@ class GamePage extends React.Component {
       localSelectedTile: null,
       localSelectedSet: null,
       debugMode: (process.env.NODE_ENV !== 'production'),
+      //debugMode: false,
     };
   }
   
@@ -930,16 +931,11 @@ class GamePage extends React.Component {
         />
         <ActionBar />
         <div className='actionbar'>
-          <button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>
+          {/*<button className='actionbutton' onClick={() => this.resetGame()}>Reset Game</button>*/}
           <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
         </div>
         {racks}
         
-        <div className='note'>
-          <strong>Rummikub POC</strong><br/>
-          Set validation and scoring are now working for runs of same colour and groups of same number (including jokers!)
-          See if you can make valid sets and clear your rack <strong>㋡</strong>
-          </div>
         <div className='note'>
           <strong>Game Parameters</strong><br/>
           {Constants.NUMBER_OF_TILE_DECKS} decks

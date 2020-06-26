@@ -32,7 +32,7 @@
 
 .bigbutton {
   background: rgb(135, 206, 235);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 3px;
   width: 250px;
@@ -52,8 +52,21 @@
 
 .bigbutton:active {
   background: rgb(77, 123, 143);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
 }
 .bigbutton:focus {
   outline: none;
 }
-  
+
+.landingnote {
+  text-align: center;
+  font-size: 10pt;
+  color: rgb(145, 166, 202);
+  padding: 5px;
+  margin-left: 15%;
+  margin-right: 15%;
+}
+.landingnote strong {
+  color: white;
+  font-weight: normal;
+}
