@@ -1,13 +1,13 @@
 
 
   .titlebarbg {
-    background: rgb(53, 63, 77);
+    background: rgb(46, 54, 66);
     width: 100%;
     overflow: hidden;
   }
 
   .titlebar {
-    background: rgb(53, 63, 77);
+    /*background: rgb(53, 63, 77);*/
     font-size: 12pt;
     margin: auto;
     max-width: 1032px;
@@ -53,7 +53,7 @@
   }
  
   .menulink i {
-    color: rgb(182, 202, 238);
-    font-size: 12pt;
+    color: rgb(204, 175, 141);
+    font-size: 12.5pt;
     font-family: "Times New Roman", Times, serif; 
   }
