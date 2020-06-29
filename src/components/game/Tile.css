@@ -67,15 +67,15 @@
   }
 
   .tile-selected {
-    border: 1px solid rgb(33, 160, 214);
-    box-shadow: 0px 0px 5px rgb(33, 160, 214);
+    border: 1px solid var(--highlight-colour);
+    box-shadow: 0px 0px 5px var(--highlight-colour);
     transform: scale(1.15);
     animation: pick-up 0.25s ease;
   }
 
   .tile-selected:hover {
-    border: 1px solid rgb(33, 160, 214);
-    box-shadow: 0px 0px 7px rgba(33, 160, 214);
+    border: 1px solid var(--highlight-colour);
+    box-shadow: 0px 0px 7px var(--highlight-colour);
   }
 
   .tile-moved {
@@ -145,12 +145,12 @@
   @keyframes drop-in {
     from {
       transform: scale(1.15);
-      border: 1px solid rgb(33, 160, 214);
-      box-shadow: 0px 0px 5px rgb(33, 160, 214);
+      border: 1px solid var(--highlight-colour);
+      box-shadow: 0px 0px 5px var(--highlight-colour);
     }
     to {
       transform: scale(1);
       border: 1px solid #aaa;
-      box-shadow: 0px 0px 5px rgba(33, 160, 214, 0.5);
+      box-shadow: 0px 0px 5px var(--highlight-fade-colour);
     }
   }

@@ -17,9 +17,8 @@ class LandingPage extends React.Component {
           <span><Link to={ROUTES.GAME}><span className="bigbutton">Join Game</span></Link></span>
         </div>
         <div className='landingnote'>
-          <p><strong>This is currently a work in progress</strong><br/>
-            Single player only for now. See if you can make valid sets and clear your rack ㋡
-          </p>
+            <h4>This is currently a work in progress</h4>
+            <p>Single player only for now. See if you can make valid sets and clear your rack <strong>㋡</strong></p>
         </div>
       </div>
     );

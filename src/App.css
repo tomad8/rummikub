@@ -6,12 +6,12 @@
 }
 
 a {
-  color: rgb(145, 166, 202);
+  color: var(--link-color);
   text-decoration: none;
 }
 
 a:hover {
-  color: rgb(182, 202, 238);
+  color: var(--link-hover-color);
 }
 
 

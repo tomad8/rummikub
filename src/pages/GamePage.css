@@ -11,11 +11,8 @@
   .note {
     text-align: center;
     font-size: 10pt;
-    color: rgb(145, 166, 202);
+    color: var(--note-color);
     padding: 5px;
   }
-  .note strong {
-    color: white;
-    font-weight: normal;
-  }
+
   

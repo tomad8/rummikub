@@ -22,11 +22,13 @@ class ProfileFormBase extends React.Component {
         <div>
           <p>userID: <strong>{this.props.authUser.uid}</strong></p>
           <p>isAnonymous: <strong>{this.props.authUser.isAnonymous ? "True" : "False"}</strong></p>
+          {/*
           <p>displayName: <strong>{this.props.authUser.displayName}</strong></p>
           <p>email: <strong>{this.props.authUser.email}</strong></p>
           <p>emailVerified: <strong>{this.props.authUser.emailVerified ? "True" : "False"}</strong></p>
           <p>photoURL: <strong>{this.props.authUser.photoURL}</strong></p>
           <p>providerData: <strong>{this.props.authUser.providerData}</strong></p>
+          */}
         </div>
     }
     else {

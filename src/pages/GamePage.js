@@ -937,7 +937,6 @@ class GamePage extends React.Component {
         {racks}
         
         <div className='note'>
-          <strong>Game Parameters</strong><br/>
           {Constants.NUMBER_OF_TILE_DECKS} decks
            • {Constants.NUMBER_OF_TILE_SUITS} colours (suits)
            • {Constants.NUMBER_OF_TILE_RANKS} numbers (ranks)

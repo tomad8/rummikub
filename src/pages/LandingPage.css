@@ -3,20 +3,19 @@
 .landingpage {
   margin: auto;
   max-width: 1032px;
-  color: white;
   text-align: center;
   padding: 0px;
 }
 
 .landingtitle {
-  color: rgb(145, 166, 202);
+  color: var(--title-color);
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
   font-size: 30pt;
   text-align: center;
   padding: 0px;
 }
 .landingtitle i {
-  color: rgb(204, 175, 141);
+  color: var(--emphasis-color);
   font-size: 31pt;
   font-family: "Times New Roman", Times, serif; 
 }
@@ -31,7 +30,7 @@
 }
 
 .bigbutton {
-  background: rgb(135, 206, 235);
+  background: var(--button-background);
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 3px;
@@ -47,11 +46,11 @@
 }
 
 .bigbutton:hover {
-  background: rgb(113, 178, 204);
+  background: var(--button-hover-background);
 }
 
 .bigbutton:active {
-  background: rgb(77, 123, 143);
+  background: var(--button-active-background);
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
 }
 .bigbutton:focus {
@@ -61,12 +60,8 @@
 .landingnote {
   text-align: center;
   font-size: 10pt;
-  color: rgb(145, 166, 202);
+  color: var(--note-color);
   padding: 5px;
   margin-left: 15%;
   margin-right: 15%;
-}
-.landingnote strong {
-  color: white;
-  font-weight: normal;
 }

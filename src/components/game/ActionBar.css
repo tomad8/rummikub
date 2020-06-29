@@ -9,7 +9,7 @@
   }
 
   .actionbutton {
-    background: rgb(135, 206, 235);
+    background: var(--button-background);
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     border: none;
     border-radius: 3px;
@@ -22,11 +22,11 @@
   }
 
   .actionbutton:hover {
-    background: rgb(113, 178, 204);
+    background: var(--button-hover-background);
   }
 
   .actionbutton:active {
-    background: rgb(77, 123, 143);
+    background: var(--button-active-background);
   }
   .actionbutton:focus {
     outline: none;

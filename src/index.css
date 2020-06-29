@@ -1,3 +1,28 @@
+:root {  
+  --body-background-color: rgb(40, 44, 52);
+  --title-color: rgb(145, 166, 202);
+  --heading-color: white;
+  --text-color: white;
+  --link-color: rgb(204, 175, 141);
+  --link-hover-color: rgb(220, 150, 70);
+  --note-color: rgb(145, 166, 202);
+
+  --emphasis-color: rgb(204, 175, 141);
+
+  --menu-background-color: rgb(46, 54, 66);
+  --menu-text-color: rgb(145, 166, 202);
+  --menu-hover-background-color: rgba(182, 202, 238, 0.1);
+  --menu-active-background-color: rgba(182, 202, 238, 0.2);
+  
+  --button-background: rgb(135, 206, 235);
+  --button-hover-background: rgb(113, 178, 204);
+  --button-active-background: rgb(77, 123, 143);
+
+  --highlight-colour: rgb(33, 160, 214);
+  --highlight-fade-colour: rgba(33, 160, 214, 0.5);
+
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,7 +30,13 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: rgb(40, 44, 52);
+  background-color: var(--body-background-color);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--heading-color);
+  font-weight: normal;
 }
 
 code {

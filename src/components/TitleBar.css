@@ -1,7 +1,7 @@
 
 
   .titlebarbg {
-    background: rgb(46, 54, 66);
+    background: var(--menu-background-color);
     width: 100%;
     overflow: hidden;
   }
@@ -11,29 +11,31 @@
     font-size: 12pt;
     margin: auto;
     max-width: 1032px;
-    padding: 2px;
+    padding: 1px;
     overflow: hidden;
   }
 
-
   .menulink {
+    color: var(--menu-text-color);
     float: left;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 3px;
   }
 
   .userlink {
+    color: var(--menu-text-color);
     float: right;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 3px;
   }
 
   .menulink:hover, .userlink:hover {
-    background: rgba(182, 202, 238, 0.1);
+    color: var(--menu-text-color);
+    background: var(--menu-hover-background-color);
   }
   
   .menulink:active, .userlink:active {
-    background: rgba(182, 202, 238, 0.2);
+    background: var(--menu-active-background-color);
   }
 
   .menulink img {
@@ -53,7 +55,7 @@
   }
  
   .menulink i {
-    color: rgb(204, 175, 141);
+    color: var(--emphasis-color);
     font-size: 12.5pt;
     font-family: "Times New Roman", Times, serif; 
   }
