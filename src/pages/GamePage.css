@@ -4,15 +4,6 @@
     margin: auto;
     max-width: 1032px;
     text-align: center;
-    padding: 0px;
-    
-  }
-
-  .note {
-    text-align: center;
-    font-size: 10pt;
-    color: var(--note-color);
-    padding: 5px;
   }
 
   

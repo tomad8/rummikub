@@ -12,4 +12,19 @@ export function shuffle(a) {
     return a;
   }
   
+
+export function getID(numberOfCharacters) {
+    // Alphanumeric characters
+    const chars =
+       // 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+       // 'abcdefghijklmnopqrstuvwxyz0123456789';
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+       let id = '';
+    for (let i = 0; i < numberOfCharacters; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return id;
+}
+  
   

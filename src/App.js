@@ -50,7 +50,7 @@ class AppFormBase extends React.Component {
           
           {/*<Route exact path={ROUTES.LANDING} component={LandingPage} />*/}
           <Route exact path={ROUTES.LANDING} component={LandingPage} />
-          <Route path={ROUTES.GAME} component={GamePage} />
+          <Route path={ROUTES.GAME} render={(routeProps) => (<GamePage {...routeProps} authUser={this.state.authUser} />)} />
           <Route path={ROUTES.LOGIN} component={LoginPage} />
           {/*<Route path={ROUTES.LOGIN} render={(routeProps) => (<LoginPage {...routeProps} prevRoute={this.props.location.pathname} />)} />*/}
           <Route path={ROUTES.PROFILE} render={(routeProps) => (<ProfilePage {...routeProps} authUser={this.state.authUser} />)} />

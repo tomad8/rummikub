@@ -9,7 +9,8 @@ import "firebase/analytics";
 
 // Add the Firebase products that you want to use
 import "firebase/auth";
-import "firebase/firestore";
+//import "firebase/firestore";
+import 'firebase/database';
 
 const config = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -27,8 +28,8 @@ const config = {
       firebase.initializeApp(config);
 
       this.auth = firebase.auth();
-
       this.analytics = firebase.analytics();
+      this.db = firebase.database();
     }
 
     // *** Auth API ***
@@ -54,6 +55,18 @@ const config = {
     doLogEvent = (eventName, eventParams, options) => 
       this.analytics.logEvent(eventName, eventParams, options);
     
+
+    // *** DB - User API ***
+    user = uid => this.db.ref(`users/${uid}`);
+    users = () => this.db.ref('users');
+
+    // *** DB - Game API ***
+    game = gameid => this.db.ref(`games/${gameid}`);
+    games = () => this.db.ref('games');
+
+
+    
+
   }
 
   export default Firebase;
