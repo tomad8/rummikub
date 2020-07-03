@@ -1,0 +1,43 @@
+
+
+  .changename {
+    text-align: center;
+    padding: 0px;
+    margin: auto;
+  }
+
+  .changename form input {
+    text-align: left;
+    padding: 8px;
+    margin: 5px;
+    border: none;
+    border-radius: 2px;
+    font-size: 12pt;
+    
+  }
+
+  .changenamebutton {
+    background: var(--button-background);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 2px;
+    color: black;
+    /*font-weight: bold;*/
+    margin: 5px;
+    padding: 8px;
+    font-size: 12pt;
+  }
+
+  .changenamebutton:hover {
+    background: var(--button-hover-background);
+  }
+  .changenamebutton:active {
+    background: var(--button-active-background);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  }
+  .changenamebutton:disabled {
+    background: var(--button-disabled-background);
+  }
+  .changenamebutton:focus {
+    outline: none;
+  }

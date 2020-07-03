@@ -2,7 +2,7 @@
   --body-background-color: rgb(40, 44, 52);
   --title-color: rgb(145, 166, 202);
   --heading-color: white;
-  --text-color: white;
+  --text-color: rgb(145, 166, 202);
   --link-color: rgb(204, 175, 141);
   --link-hover-color: rgb(220, 150, 70);
   --note-color: rgb(145, 166, 202);
@@ -17,6 +17,7 @@
   --button-background: rgb(135, 206, 235);
   --button-hover-background: rgb(113, 178, 204);
   --button-active-background: rgb(77, 123, 143);
+  --button-disabled-background: rgb(81, 88, 104);
 
   --highlight-color: rgb(33, 160, 214);
   --highlight-fade-color: rgba(33, 160, 214, 0.5);
@@ -34,9 +35,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--body-background-color);
   color: var(--text-color);
+  font-size: 12pt;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3 {
+  color: var(--heading-color);
+  font-weight: lighter;
+}
+
+h4, h5, h6 {
   color: var(--heading-color);
   font-weight: normal;
 }

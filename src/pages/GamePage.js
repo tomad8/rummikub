@@ -2,20 +2,27 @@ import React from 'react';
 import './GamePage.css';
 import * as Utils from '../utils';
 import * as ROUTES from '../constants/routes';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { withFirebase } from '../components/Firebase';
-import Lobby from '../components/game/Lobby';
+import { AuthUserContext } from '../components/Session';
+import Lobby from '../components/Lobby/Lobby';
 import Game from '../components/game/Game';
 
 
 const GamePage = () => (
-  <div className='gamepage'>
-    <GameForm />
-  </div>
+  <AuthUserContext.Consumer>
+    {user => (
+      <div className='gamepage'>
+        <GameForm user={user} />
+      </div>
+    )}
+  </AuthUserContext.Consumer>
 );
 
 
 class GameFormBase extends React.Component {
+  _isMounted = false;
+    
   constructor(props) {
     super(props);
     this.state = {
@@ -23,12 +30,11 @@ class GameFormBase extends React.Component {
       loading: false,
       error: null,
       db: {
-        host: 'ABC123',
-        gameInProgress: true,
+        gameInProgress: false,
         players: [
           {
             uid: 'ABC123',
-            name: 'Player 1',
+            name: this.props.user.displayName,
             score: 0,
           },
         ],
@@ -41,6 +47,8 @@ class GameFormBase extends React.Component {
   }
   
   componentDidMount() {
+    this._isMounted = true;
+    
     const pathname = this.props.location.pathname;
     
     if (pathname === ROUTES.GAME){
@@ -48,15 +56,14 @@ class GameFormBase extends React.Component {
       let gameId = Utils.getID(6);
       //TODO - check for collisions - although very unlikely!!
 
-
       this.setState({ 
         db: {
-          host: 'ABC123',
+          host: this.props.user.authUser.uid,
           gameInProgress: false,
           players: [
             {
-              uid: 'ABC123',
-              name: 'Player 1',
+              uid: this.props.user.authUser.uid,
+              name: this.props.user.displayName,
               score: 0,
             },
           ],
@@ -67,7 +74,6 @@ class GameFormBase extends React.Component {
       
       // Create a new game in Firebase realtime database
       this.saveGame(gameId, this.state.db);
-
     } 
     else {
       // try to get game id from URL
@@ -77,11 +83,10 @@ class GameFormBase extends React.Component {
       this.loadGame(gameId);
       //if new game then init it:
     }
-    
   }
 
   componentWillUnmount() {
-    //free up any resources?
+    this._isMounted = false;
   }
 
   saveGame(gameId, data) {
@@ -94,63 +99,78 @@ class GameFormBase extends React.Component {
       .then(
         () => {
           console.log('Sucessfully saved game ' + gameId + ' in Firebase DB')
-          this.setState({ status: 'Game ' + gameId + ' created', error: null,});
-          this.props.history.push(ROUTES.GAME + '/' + gameId); 
+          if (this._isMounted) {
+            this.setState({ status: 'Game ' + gameId + ' created', error: null,});
+            // replace not push because we don't want user to be able to browse back to /game
+            this.props.history.replace(ROUTES.GAME + '/' + gameId); 
+          }
         })
       .catch(
         error => {
           console.log('Failed to create game in Firebase DB: ' + error.code + ' - ' + error.message)
-          this.setState({ status: 'Failed to create game', error });
+          if (this._isMounted) {
+            this.setState({ status: 'Failed to create game', error: error });
+          }
         });
   }
 
   loadGame(gameId) {
     this.setState({ loading: true });
  
-    this.props.firebase.game(gameId).on('value', snapshot => {
-      this.setState({
-        db: snapshot.val(),
-        loading: false,
-        gameId: gameId, 
-        error: null,
-        status: 'Game ' + gameId + ' loaded',
-      });
+    this.props.firebase.game(gameId)
+    .on('value', snapshot => {
+      if (this._isMounted) {
+        this.setState({
+          db: snapshot.val(),
+          loading: false,
+          gameId: gameId, 
+          error: null,
+          status: (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found'),
+        })
+      }
     });
   }
 
-  logDebug(text) {
-    if (this.state.debugMode) {
-      console.log(text);
-    }
+  handleClickStartGame() {
+    const gameId = this.state.gameId;
+    
+    //TODO: do some stuff, determine player order, current player, call resertGame() etc
+
+    this.setState({ 
+      db: {
+        gameInProgress: true,
+      },
+    });
+    
+    this.props.firebase.doLogEvent('game_start', {gameId: this.state.gameId});
+    
+    this.saveGame(gameId, this.state.db);
   }
 
-  
+ 
 
   render() {
-    const renderContent = [];
-
-    if (this.state.gameInProgress) {
-      renderContent.push( 
-        <Game 
-          db = {this.state.db}
-        />
-      );
-    }
-    else {
-      renderContent.push( 
-        <Lobby 
+    const gameComponent = 
+      <Game 
+        db = {this.state.db}
+      />;
+    
+    const lobbyComponent = 
+      <Lobby 
         gameId = {this.state.gameId}  
         gameUrl = {window.location.href} 
         db = {this.state.db}
-        />
-      );
-    }
-    return (
+        onClickStartGame={() => this.handleClickStartGame()}
+      />;
+
+      return (
       <div>
-        <p>{this.state.status}</p>
-        {this.state.loading && <p>{this.state.loading ? 'Loading...' : ''}</p>}
         {this.state.error && <p className='error'>{this.state.error.message}</p>}
-        {renderContent}
+        {this.state.loading && <p>{this.state.loading ? 'Loading...' : ''}</p>}
+        <p>{this.state.status}</p>
+        {this.state.db ? 
+          (this.state.gameInProgress ? gameComponent : lobbyComponent) :
+          <p><Link to={ROUTES.LANDING}>Go to home page</Link></p>}
       </div>
     );
   }

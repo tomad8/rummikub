@@ -28,14 +28,14 @@ class LoginFormBase extends React.Component {
       .then(authUser => {
         // Create a user in Firebase realtime database
         return this.props.firebase
-        //return this.props.firebase
-          .user(authUser.user.uid)
+          .user(authUser.uid)
           .set({
             anonymous: true,
+            displayName: null,
           });
       }).then(() => {
-        console.log("Sucessfully signed in to Firebase")
-        this.props.firebase.doLogEvent("login", {method: "Anonymous"})
+        console.log('Sucessfully signed in to Firebase')
+        this.props.firebase.doLogEvent('login', {method: 'Anonymous'})
         this.setState({ status: 'Logged in', error: null,});
         //this.props.history.push(ROUTES.LANDING); 
         //Redirect back to previous route, not always to landing:
@@ -45,7 +45,7 @@ class LoginFormBase extends React.Component {
       })
       .catch(error => {
         console.log('Failed to sign in to Firebase: ' + error.code + ' - ' + error.message)
-        this.setState({ status: 'Failed to authenticate with server', error });
+        this.setState({ status: 'Failed to authenticate with server', error: error });
       });
   }
       

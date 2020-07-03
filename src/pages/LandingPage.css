@@ -11,6 +11,7 @@
   color: var(--title-color);
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
   font-size: 30pt;
+  font-weight: normal;
   text-align: center;
   padding: 0px;
 }
@@ -31,18 +32,17 @@
 
 .bigbutton {
   background: var(--button-background);
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 3px;
   width: 250px;
-  height: 40px;
+  height: 50px;
   color: black;
-  font-size: 20px;
+  font-size: 14pt;
   /*font-weight: bold;*/
   margin: auto;
   padding: 5px;
   vertical-align: middle;
-  line-height: 40px;
 }
 
 .bigbutton:hover {
@@ -59,7 +59,6 @@
 
 .landingnote {
   text-align: center;
-  font-size: 10pt;
   color: var(--note-color);
   padding: 5px;
   margin-left: 15%;

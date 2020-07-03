@@ -1,0 +1,16 @@
+
+
+  .footerbg {
+    background: var(--menu-background-color);
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .footer {
+    font-size: 8pt;
+    margin: auto;
+    max-width: 1032px;
+    padding: 10px;
+    overflow: hidden;
+  }
+

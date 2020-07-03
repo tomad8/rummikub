@@ -9,12 +9,12 @@ class LandingPage extends React.Component {
     
     return (
       <div className='landingpage'>
-        <p className="landingtitle">Rummi<i>h</i>ub</p>
-        <p>Play Rummikub online with your friends</p>
+        <h1 className="landingtitle">Rummi<i>h</i>ub</h1>
+        <h3>Play Rummikub online with your friends</h3>
        
         <div className="landingbuttons">
-          <span><Link to={ROUTES.GAME}><span className="bigbutton">Create Game</span></Link></span>
-          <span><Link to={ROUTES.GAME}><span className="bigbutton">Join Game</span></Link></span>
+          <span><Link to={ROUTES.GAME}><button className="bigbutton">Create Game</button></Link></span>
+          <span><Link to={ROUTES.GAME}><button className="bigbutton">Join Game</button></Link></span>
         </div>
         <div className='landingnote'>
             <h4>This is currently a work in progress</h4>
