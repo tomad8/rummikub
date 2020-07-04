@@ -27,10 +27,11 @@ class LoginFormBase extends React.Component {
       .doSignInAnonymously()
       .then(authUser => {
         // Create a user in Firebase realtime database
+        //TODO: investigate this - it is creating a null user if uid is null
         return this.props.firebase
           .user(authUser.uid)
           .set({
-            anonymous: true,
+            anonymous: true, //don't need, because can get from authUser
             displayName: null,
           });
       }).then(() => {

@@ -43,6 +43,7 @@
   margin: auto;
   padding: 5px;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .bigbutton:hover {
