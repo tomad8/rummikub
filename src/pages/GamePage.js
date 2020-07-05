@@ -8,6 +8,7 @@ import { AuthUserContext } from '../components/Session';
 import Lobby from '../components/Lobby/Lobby';
 import Game from '../components/game/Game';
 import Loading from '../components/Loading'
+import NotFound from '../components/NotFound';
 
 
 const GamePage = () => (
@@ -225,7 +226,7 @@ class GameFormBase extends React.Component {
         <p>{this.state.status}</p>
         {this.state.db && this.state.db.host ? 
           (this.state.gameInProgress ? gameComponent : lobbyComponent) :
-          <p><Link to={ROUTES.LANDING}>Go to home page</Link></p>}
+          <NotFound />}
       </div>
     );
   }

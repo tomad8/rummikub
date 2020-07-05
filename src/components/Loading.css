@@ -3,17 +3,18 @@
      Implemented in CSS by Tom Adey */
 
   .loadingspinner {
-    --square: 10px;
-    --offset: 12px;
-    --duration: 2.5s;
+    --square: 20px;
+    --offset: 24px;
+    --duration: 3s;
+    --timing-function: ease-in-out;
     position: relative;
     width: calc( 4 * var(--offset));
     height: calc( 3 * var(--offset));
     padding: 0px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 50px;
+    margin-bottom: 25px;
   }
 
   .loadingspinner div {
@@ -35,31 +36,31 @@
   .loadingspinner #square1 {
     left: calc( 0 * var(--offset) );
     top:  calc( 0 * var(--offset) );
-    animation: square1 var(--duration) linear infinite;
+    animation: square1 var(--duration) var(--timing-function) infinite;
   }
 
   .loadingspinner #square2 {
     left: calc( 0 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square2 var(--duration) linear infinite;
+    animation: square2 var(--duration) var(--timing-function) infinite;
   }
   
   .loadingspinner #square3 {
     left: calc( 1 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square3 var(--duration) linear infinite;
+    animation: square3 var(--duration) var(--timing-function) infinite;
   }
 
   .loadingspinner #square4 {
     left: calc( 2 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square4 var(--duration) linear infinite;
+    animation: square4 var(--duration) var(--timing-function) infinite;
   }
 
   .loadingspinner #square5 {
     left: calc( 3 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square5 var(--duration) linear infinite;
+    animation: square5 var(--duration) var(--timing-function) infinite;
   }
 
   @keyframes square1 {
