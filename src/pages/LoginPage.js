@@ -3,9 +3,11 @@ import './LoginPage.css';
 import { withRouter } from 'react-router-dom';
 //import * as ROUTES from '../constants/routes';
 import { withFirebase } from '../components/Firebase';
+import Loading from '../components/Loading';
 
 const INITIAL_STATE = {
-  status: 'Loading...',
+  status: null,
+  loading: true,
   error: null,
 };
 
@@ -37,7 +39,7 @@ class LoginFormBase extends React.Component {
       }).then(() => {
         console.log('Sucessfully signed in to Firebase')
         this.props.firebase.doLogEvent('login', {method: 'Anonymous'})
-        this.setState({ status: 'Logged in', error: null,});
+        this.setState({ status: 'Logged in', loading: false, error: null,});
         //this.props.history.push(ROUTES.LANDING); 
         //Redirect back to previous route, not always to landing:
         //console.log("Redirecting back to: " + this.props.prevRoute); //undefined :(
@@ -46,15 +48,16 @@ class LoginFormBase extends React.Component {
       })
       .catch(error => {
         console.log('Failed to sign in to Firebase: ' + error.code + ' - ' + error.message)
-        this.setState({ status: 'Failed to authenticate with server', error: error });
+        this.setState({ status: 'Failed to authenticate with server', loading: false, error: error });
       });
   }
       
   render() {
-    const { status, error } = this.state;
+    const { status, loading, error } = this.state;
 
     return (
       <div>
+        {loading && <Loading />}
         <p>{status}</p>
         {error && <p className='error'>{error.message}</p>}
       </div>

@@ -7,6 +7,7 @@ import { withFirebase } from '../components/Firebase';
 import { AuthUserContext } from '../components/Session';
 import Lobby from '../components/Lobby/Lobby';
 import Game from '../components/game/Game';
+import Loading from '../components/Loading'
 
 
 const GamePage = () => (
@@ -210,7 +211,7 @@ class GameFormBase extends React.Component {
     
     const lobbyComponent = 
       <Lobby 
-        user = {this.state.user}
+        user = {this.props.user}
         gameId = {this.state.gameId}  
         gameUrl = {window.location.href} 
         db = {this.state.db}
@@ -220,7 +221,7 @@ class GameFormBase extends React.Component {
       return (
       <div>
         {this.state.error && <p className='error'>{this.state.error.message}</p>}
-        {this.state.loading && <p>{this.state.loading ? 'Loading...' : ''}</p>}
+        {this.state.loading && <Loading />}
         <p>{this.state.status}</p>
         {this.state.db && this.state.db.host ? 
           (this.state.gameInProgress ? gameComponent : lobbyComponent) :

@@ -21,7 +21,6 @@ class ProfileFormBase extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       error: null,
       isAnonymous: this.props.user && this.props.user.authUser ? this.props.user.authUser.isAnonymous : null,
       userId: this.props.user && this.props.user.authUser ? this.props.user.authUser.uid : null,
@@ -31,30 +30,7 @@ class ProfileFormBase extends React.Component {
     };
   }
 
-  componentDidMount() {
-  /*  if (this.props.user && this.props.user.authUser) {
-      this.loadUser(this.props.user.authUser.uid);
-    }*/
-  }
-
- /* loadUser(userId) {
-    this.setState({ loading: true });
- 
-    this.props.firebase.user(userId)
-    .on('value', snapshot => {
-      this.setState({
-        dbUser: snapshot.val(),
-        loading: false,
-        userId: userId, 
-        error: (snapshot.val() ? null : 'Failed to load user ' + userId),
-        status: 'User ' + userId + ' loaded',
-      })
-    });
-
-  }*/
-
   render() {
-    
     let userDetails;
 
     if (this.props.user && this.props.user.authUser) {
