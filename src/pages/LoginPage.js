@@ -39,7 +39,7 @@ class LoginFormBase extends React.Component {
       }).then(() => {
         console.log('Sucessfully signed in to Firebase')
         this.props.firebase.doLogEvent('login', {method: 'Anonymous'})
-        this.setState({ status: 'Logged in', loading: false, error: null,});
+        this.setState({ status: null, loading: false, error: null,});
         //this.props.history.push(ROUTES.LANDING); 
         //Redirect back to previous route, not always to landing:
         //console.log("Redirecting back to: " + this.props.prevRoute); //undefined :(
@@ -56,9 +56,9 @@ class LoginFormBase extends React.Component {
     const { status, loading, error } = this.state;
 
     return (
-      <div>
+      <div style={{padding: '10px', paddingTop: '50px'}} >
         {loading && <Loading />}
-        <p>{status}</p>
+        {status && <p>{status}</p>}
         {error && <p className='error'>{error.message}</p>}
       </div>
     );

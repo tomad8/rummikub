@@ -2,6 +2,7 @@ export const LANDING = '/';
 export const PROFILE = '/profile';
 export const GAME = '/game';
 export const LOGIN = '/login';
+export const JOIN = '/join';
 //export const SIGN_UP = '/signup';
 //export const SIGN_IN = '/signin';
 //export const HOME = '/home';

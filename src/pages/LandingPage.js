@@ -14,7 +14,7 @@ class LandingPage extends React.Component {
        
         <div className="landingbuttons">
           <span><Link to={ROUTES.GAME}><button className="bigbutton">Create Game</button></Link></span>
-          <span><Link to={ROUTES.GAME}><button className="bigbutton">Join Game</button></Link></span>
+          <span><Link to={ROUTES.JOIN}><button className="bigbutton">Join Game</button></Link></span>
         </div>
         <div className='landingnote'>
             <h4>This is currently a work in progress</h4>

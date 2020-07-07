@@ -15,7 +15,7 @@ class ChangeName extends React.Component {
     this.props.firebase
       .user(this.props.user.authUser.uid)
       .set({
-        displayName: this.state.displayName,
+        displayName: this.state.displayName.trim(),
         })
       .then(
         () => {
@@ -41,8 +41,8 @@ class ChangeName extends React.Component {
     } = this.state;
 
     const isInvalid =
-      !displayName ||
-      displayName.length > 30;
+      !displayName.trim() ||
+      displayName.trim().length > 20;
     
     const isAmended = displayName.trim() !== this.props.user.displayName;
 
@@ -54,10 +54,11 @@ class ChangeName extends React.Component {
             value={displayName}
             onChange={this.onChange}
             type="text"
+            maxLength="20"
             placeholder="Display name"
           />
           <button className="changenamebutton" disabled={isInvalid || !isAmended} type="submit">Confirm</button>
-          {isInvalid && <p className="error">Display name must be between 1 and 30 charaters in length</p>}
+          {isInvalid && <p className="error">Display name must be between 1 and 20 characters in length</p>}
           {error && <p className="error">{error.message}</p>}
         </form> 
       </div>

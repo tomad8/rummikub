@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage';
 import GamePage from './pages/GamePage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
+import JoinPage from './pages/JoinPage';
 
 const App = () => (
   <Router>
@@ -35,8 +36,9 @@ class AppFormBase extends React.Component {
         <Switch>
           <Route exact path={ROUTES.LANDING} component={LandingPage} />
           <Route path={ROUTES.GAME} component={GamePage} />
-          <Route path={ROUTES.LOGIN} component={LoginPage} />
-          <Route path={ROUTES.PROFILE} component={ProfilePage} />
+          <Route exact path={ROUTES.JOIN} component={JoinPage} />
+          <Route exact path={ROUTES.LOGIN} component={LoginPage} />
+          <Route exact path={ROUTES.PROFILE} component={ProfilePage} />
           {/*<Route path={ROUTES.GAME} render={(routeProps) => (<GamePage {...routeProps} authUser={this.state.authUser} />)} />*/}
           {/*<Route path={ROUTES.LOGIN} render={(routeProps) => (<LoginPage {...routeProps} prevRoute={this.props.location.pathname} />)} />*/}
           {/*<Route path={ROUTES.PROFILE} render={(routeProps) => (<ProfilePage {...routeProps} authUser={this.state.authUser} />)} />*/}

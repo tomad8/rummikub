@@ -5,16 +5,23 @@
   .loadingspinner {
     --square: 20px;
     --offset: 24px;
-    --duration: 3s;
+
+    --duration: 2.4s;
+    --delay: 0.1s;
     --timing-function: ease-in-out;
+
+    --in-duration: 0.2s;
+    --in-delay: 0.05s;
+    --in-timing-function: ease-out;
+
     position: relative;
     width: calc( 4 * var(--offset));
     height: calc( 3 * var(--offset));
     padding: 0px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 50px;
-    margin-bottom: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   .loadingspinner div {
@@ -36,31 +43,36 @@
   .loadingspinner #square1 {
     left: calc( 0 * var(--offset) );
     top:  calc( 0 * var(--offset) );
-    animation: square1 var(--duration) var(--timing-function) infinite;
+    animation: square1 var(--duration) var(--delay) var(--timing-function) infinite,
+               squarefadein var(--in-duration) calc(1 * var(--in-delay)) var(--in-timing-function) both;
   }
 
   .loadingspinner #square2 {
     left: calc( 0 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square2 var(--duration) var(--timing-function) infinite;
+    animation: square2 var(--duration) var(--delay) var(--timing-function) infinite,
+              squarefadein var(--in-duration) calc(1 * var(--in-delay)) var(--in-timing-function) both;
   }
   
   .loadingspinner #square3 {
     left: calc( 1 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square3 var(--duration) var(--timing-function) infinite;
+    animation: square3 var(--duration) var(--delay) var(--timing-function) infinite,
+               squarefadein var(--in-duration) calc(2 * var(--in-delay)) var(--in-timing-function) both;
   }
 
   .loadingspinner #square4 {
     left: calc( 2 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square4 var(--duration) var(--timing-function) infinite;
+    animation: square4 var(--duration) var(--delay) var(--timing-function) infinite,
+               squarefadein var(--in-duration) calc(3 * var(--in-delay)) var(--in-timing-function) both;
   }
 
   .loadingspinner #square5 {
     left: calc( 3 * var(--offset) );
     top:  calc( 1 * var(--offset) );
-    animation: square5 var(--duration) var(--timing-function) infinite;
+    animation: square5 var(--duration) var(--delay) var(--timing-function) infinite,
+               squarefadein var(--in-duration) calc(4 * var(--in-delay)) var(--in-timing-function) both;
   }
 
   @keyframes square1 {
@@ -107,4 +119,9 @@
     66.67%  {left: calc( 2 * var(--offset) ); top: calc( 0 * var(--offset) ); }
     75.00%  {left: calc( 2 * var(--offset) ); top: calc( 1 * var(--offset) ); }
     100%    {left: calc( 2 * var(--offset) ); top: calc( 1 * var(--offset) ); }
+  }
+
+  @keyframes squarefadein {
+    0%      {transform: scale(0.75); opacity: 0.0;}
+    100%    {transform: scale(1.0); opacity: 1.0;}
   }

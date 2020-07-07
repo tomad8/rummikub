@@ -19,6 +19,7 @@
     padding: 8px;
     display:inline-block;
     vertical-align: middle;
+    cursor: pointer;
   }
 
   .actionbutton:hover {
@@ -27,6 +28,7 @@
 
   .actionbutton:active {
     background: var(--button-active-background);
+    cursor: default;
   }
   .actionbutton:focus {
     outline: none;

@@ -1,8 +1,9 @@
 import React from 'react';
 import './GamePage.css';
 import * as Utils from '../utils';
+import * as Constants from '../constants';
 import * as ROUTES from '../constants/routes';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { withFirebase } from '../components/Firebase';
 import { AuthUserContext } from '../components/Session';
 import Lobby from '../components/Lobby/Lobby';
@@ -30,6 +31,7 @@ class GameFormBase extends React.Component {
     this.state = {
       gameId: null,
       loading: false,
+      saving: false,
       error: null,
       db: {
         gameInProgress: false,
@@ -50,13 +52,14 @@ class GameFormBase extends React.Component {
       
       // Create Game
       if (pathname === ROUTES.GAME){
-        let gameId = Utils.getID(6);
+        let gameId = Utils.getID(Constants.GAME_CODE_CHARACTER_LENGTH);
         //TODO - check for collisions - although very unlikely!!
 
         if (process.env.NODE_ENV !== 'production') console.log('Creating new game ' + gameId + ' as host user ' + this.props.user.authUser.uid)
         
         // setup state for new game
         this.setState({ 
+          gameId: gameId,
           db: {
             host: this.props.user.authUser.uid,
             gameInProgress: false,
@@ -93,6 +96,8 @@ class GameFormBase extends React.Component {
 
   // Save full game state
   dbSaveGame(gameId, data) {
+    this.setState({ saving: true });
+    
     return this.props.firebase
       .game(gameId)
       .set(data)
@@ -100,7 +105,11 @@ class GameFormBase extends React.Component {
         () => {
           if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully created game ' + gameId);
           if (this._isMounted) {
-            this.setState({ status: 'Game ' + gameId + ' created', error: null,});
+            this.setState({ 
+              status: 'Game ' + gameId + ' created', 
+              saving: false,
+              error: null,
+            });
             //redirect to
             if (this.props.history.pathname !== ROUTES.GAME + '/' + gameId) {
               // replace not push because we don't want user to be able to browse back to /game
@@ -222,11 +231,11 @@ class GameFormBase extends React.Component {
       return (
       <div>
         {this.state.error && <p className='error'>{this.state.error.message}</p>}
-        {this.state.loading && <Loading />}
+        {(this.state.loading || this.state.saving) && <div style={{padding: '10px', paddingTop: '50px'}} ><Loading /></div>}
         <p>{this.state.status}</p>
         {this.state.db && this.state.db.host ? 
           (this.state.gameInProgress ? gameComponent : lobbyComponent) :
-          <NotFound />}
+          !this.state.loading && <NotFound />}
       </div>
     );
   }

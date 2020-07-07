@@ -2,6 +2,7 @@ import React from 'react';
 import './Lobby.css';
 import * as Constants from '../../constants';
 import * as TileHelper from '../../utils/tilehelper';
+import Loading from '../Loading';
 
 class Lobby extends React.Component {
   
@@ -21,8 +22,11 @@ class Lobby extends React.Component {
       <div className="lobby">
         <div className="lobbyheader">
           <h1>Get ready to play!</h1>
-          <p>Share this link with other players:</p>
-          <a href={this.props.gameUrl}>{this.props.gameUrl}</a>
+          <p>Share this link or code with other players:</p>
+          <div className="lobbylink">
+            <a href={this.props.gameUrl}>{this.props.gameUrl}</a>
+            <p>Game code: <span className="lobbycode">{this.props.gameId}</span></p>
+          </div>
         </div>
         <div className="lobbybody">
           <div className="lobbyplayers">
@@ -42,8 +46,14 @@ class Lobby extends React.Component {
         </div>
         <div className="lobbyfooter">
           {isHost ?
-            <button className="bigbutton" onClick={this.props.onClickStartGame}>Start Game</button> :
-            <p>Waiting for host to start game...</p>
+            <div>
+              <p>Wait for other players to join, then start the game:</p>
+              <button className="bigbutton" onClick={this.props.onClickStartGame}>Start Game</button> 
+            </div> :
+            <div>
+              <p>Waiting for host to start game...</p>
+              <Loading />
+            </div>
           }
         </div>
       </div>

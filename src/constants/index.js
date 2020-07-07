@@ -19,4 +19,6 @@ export const NUMBER_OF_RACK_SPACES = 24;
 export const JOKER_DISPLAY_CHARACTER = '㋡';
 
 
+// Used in GamePage.js and JoinPage.js
+export const GAME_CODE_CHARACTER_LENGTH = 6;
 

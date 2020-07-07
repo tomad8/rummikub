@@ -18,6 +18,15 @@
    
   }
 
+  .lobbylink {
+    font-size: 16pt
+  }
+
+  .lobbycode {
+    font-size: 16pt;
+    color: var(--heading-color);
+  }
+
   .lobbyplayers, .lobbyinfo  {
     background: var(--menu-background-color);
     border: none;

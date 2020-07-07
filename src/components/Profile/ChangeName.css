@@ -13,7 +13,7 @@
     border: none;
     border-radius: 2px;
     font-size: 12pt;
-    
+    width: 10em;
   }
 
   .changenamebutton {
@@ -26,6 +26,7 @@
     margin: 5px;
     padding: 8px;
     font-size: 12pt;
+    cursor: pointer;
   }
 
   .changenamebutton:hover {
@@ -37,6 +38,7 @@
   }
   .changenamebutton:disabled {
     background: var(--button-disabled-background);
+    cursor: default;
   }
   .changenamebutton:focus {
     outline: none;
