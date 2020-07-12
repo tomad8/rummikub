@@ -27,7 +27,7 @@
     color: var(--heading-color);
   }
 
-  .lobbyplayers, .lobbyinfo  {
+  .lobbyplayers, .lobbyinfo, .lobbychangename  {
     background: var(--panel-background-color);
     border: none;
     border-radius: 3px;
@@ -42,7 +42,7 @@
     font-size: 10pt;
   }
   
-  .lobbyplayers h3, .lobbyinfo h3  {
+  .lobbyplayers h3, .lobbyinfo h3, .lobbychangename h3 {
     font-size: 12pt;
     margin-top: 0px;
     text-align: center;

@@ -3,6 +3,7 @@ import './Lobby.css';
 import * as Constants from '../../constants';
 import * as TileHelper from '../../utils/tilehelper';
 import Loading from '../Loading';
+import ChangeName from '../Profile/ChangeName';
 
 class Lobby extends React.Component {
   
@@ -27,8 +28,16 @@ class Lobby extends React.Component {
             <a href={this.props.gameUrl}>{this.props.gameUrl}</a>
             <p>Game code: <span className="lobbycode">{this.props.gameId}</span></p>
           </div>
+          
         </div>
         <div className="lobbybody">
+          <div className="lobbychangename">
+            <h3>Set your display name</h3>
+            <ChangeName 
+              user = {this.props.user}
+              gameId = {this.props.gameId}
+              callback = {() => this.props.onReloadRequired()}/>
+          </div>
           <div className="lobbyplayers">
             <h3>Players in the game</h3>
             <ol>{playerList}</ol>
@@ -52,7 +61,7 @@ class Lobby extends React.Component {
             </div> :
             <div>
               <p>Waiting for host to start game...</p>
-              <Loading />
+              <Loading inLine={true} />
             </div>
           }
         </div>

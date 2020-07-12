@@ -36,6 +36,7 @@ class JoinFormBase extends React.Component {
   }
 
   onSubmit = event => {
+    event.preventDefault();
     if (this.state.success) {
       this.props.history.push(ROUTES.GAME + '/' + this.state.gameId);
     }
@@ -106,7 +107,7 @@ class JoinFormBase extends React.Component {
                   Confirm
               </button>
             </form> 
-            {loading && <Loading />}
+            {loading && <Loading inLine={true}/>}
             {success && <p className="success">{success}</p>}
             {error && <p className="error">{error}</p>}
           </div>

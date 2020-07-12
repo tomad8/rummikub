@@ -12,24 +12,61 @@ class ChangeName extends React.Component {
   }
 
   onSubmit = event => {
+    event.preventDefault();
+    this.updateUserName();
+  }
+
+  updateUserName() {
     this.props.firebase
       .user(this.props.user.authUser.uid)
-      .set({
+      .update({
         displayName: this.state.displayName.trim(),
         })
       .then(
         () => {
-          console.log('Sucessfully updated displayName to: ' + this.state.displayName)
+          console.log('Sucessfully updated user displayName to: ' + this.state.displayName)
           this.props.firebase.doLogEvent('change_username', null)
           this.setState({ error: null, });
+          //update game player too
+          this.updateGamePlayerName();
         })
       .catch(
         error => {
-          console.log('Failed to update displayName: ' + error.code + ' - ' + error.message)
+          console.log('Failed to update user displayName: ' + error.code + ' - ' + error.message)
           this.setState({ error: error });
         });
   }
- 
+
+  updateGamePlayerName() {
+    if (this.props.gameId) {
+      this.props.firebase
+        .gamePlayer(this.props.gameId, this.props.user.authUser.uid)
+        .update({
+          name: this.state.displayName.trim(),
+          })
+        .then(
+          () => {
+            console.log('Sucessfully updated gameplayer displayName to: ' + this.state.displayName)
+            this.setState({ error: null, });
+            //callback on name update completion
+            if (this.props.callback) {
+              this.props.callback();
+            }
+          })
+        .catch(
+          error => {
+            console.log('Failed to update gameplayer displayName: ' + error.code + ' - ' + error.message)
+            this.setState({ error: error });
+          });
+    }
+    else {
+      //callback on name update completion
+      if (this.props.callback) {
+        this.props.callback();
+      }
+    }
+  }
+
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };

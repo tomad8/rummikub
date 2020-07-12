@@ -1,8 +1,8 @@
 import React from 'react';
 import './Loading.css';
 
-const Loading = () => (
-  <div className="loadingspinner">
+const Loading = (props) => (
+  <div className={props.inLine ? "loadingspinner loadingspinner-inline" : "loadingspinner loadingspinner-absolute"}>
     <div id="square1"></div>
     <div id="square2"></div>
     <div id="square3"></div>

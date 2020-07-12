@@ -14,7 +14,6 @@
     --in-delay: 0.05s;
     --in-timing-function: ease-out;
 
-    position: relative;
     width: calc( 4 * var(--offset));
     height: calc( 3 * var(--offset));
     padding: 0px;
@@ -22,6 +21,17 @@
     margin-right: auto;
     margin-top: 10px;
     margin-bottom: 10px;
+  }
+
+  .loadingspinner-absolute {
+    display: inline-block;
+    position: fixed;
+    margin-left: calc( -2 * var(--offset));
+    top: 100px;
+  }
+
+  .loadingspinner-inline {
+    position: relative;
   }
 
   .loadingspinner div {

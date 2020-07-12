@@ -799,17 +799,18 @@ class GameFormBase extends React.Component {
         dbHost = {this.state.dbHost}
         dbPlayers = {this.state.dbPlayers}
         onClickStartGame={() => this.handleClickStartGame()}
+        onReloadRequired={() => this.dbLoadGame(this.state.gameId, this.loadComplete)}
       />;
 
       return (
       <div>
         {this.state.error && <p className='error notification'>{this.state.error.message}</p>}
         {this.state.status && <p className='notification'>{this.state.status}</p>}
-        {(this.state.loading) && <div style={{padding: '10px', paddingTop: '50px'}} ><Loading /></div>}
         {(this.state.dbHost) ? 
           (this.state.dbGameInProgress ? gameComponent : lobbyComponent) :
           !this.state.loading && <NotFound />}
-        {(this.state.saving) && <div style={{padding: '10px', paddingTop: '10px'}} ><Loading /></div>}
+        {(this.state.loading) && <div style={{padding: '10px', paddingTop: '50px'}} ><Loading /></div>}
+        {(this.state.saving) && <div style={{padding: '10px', paddingTop: '10px'}} ><Loading inLine={true} /></div>}
       </div>
     );
   }
