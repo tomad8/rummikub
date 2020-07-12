@@ -19,7 +19,7 @@ const App = () => (
 )
 
 class AppFormBase extends React.Component {
- 
+  
   componentDidMount() {
     if (!this.props.authUser /*&& this.props.location.pathname === ROUTES.LANDING*/) {
       this.props.history.push(ROUTES.LOGIN);

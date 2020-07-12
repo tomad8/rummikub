@@ -16,7 +16,7 @@
   padding: 0px;
 }
 .landingtitle i {
-  color: var(--emphasis-color);
+  color: var(--emphasis-color-dark);
   font-size: 31pt;
   font-family: "Times New Roman", Times, serif; 
 }
@@ -37,7 +37,7 @@
   border-radius: 3px;
   width: 250px;
   height: 50px;
-  color: black;
+  color: var(--button-text-color);
   font-size: 14pt;
   /*font-weight: bold;*/
   margin: auto;

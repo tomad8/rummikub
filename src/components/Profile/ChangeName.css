@@ -21,7 +21,7 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     border: none;
     border-radius: 2px;
-    color: black;
+    color: var(--button-text-color);
     /*font-weight: bold;*/
     margin: 5px;
     padding: 8px;

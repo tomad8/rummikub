@@ -36,7 +36,9 @@ class JoinFormBase extends React.Component {
   }
 
   onSubmit = event => {
-    
+    if (this.state.success) {
+      this.props.history.push(ROUTES.GAME + '/' + this.state.gameId);
+    }
   }
 
   onChange = event => {
@@ -97,21 +99,19 @@ class JoinFormBase extends React.Component {
                 {success && <span className="joinicon"><Icons.SuccessIcon /></span>}
                 {error && <span className="joinicon"><Icons.ErrorIcon /></span>}
               </label>
-              <Link to={success ? ROUTES.GAME + '/' + this.state.gameId : ROUTES.JOIN}>
-                <button 
-                  className="joinbutton" 
-                  disabled={!success} 
-                  type="submit">
-                    Confirm
-                </button>
-              </Link>
+              <button 
+                className="joinbutton" 
+                disabled={!success} 
+                type="submit">
+                  Confirm
+              </button>
             </form> 
             {loading && <Loading />}
-            {success && <p>{success}</p>}
+            {success && <p className="success">{success}</p>}
             {error && <p className="error">{error}</p>}
           </div>
         </div>
-        <h2>No game code?</h2>
+        <h2>Don't have a game code?</h2>
         <div className="note">
           The game code is given to the host when creating a new game.
         </div>

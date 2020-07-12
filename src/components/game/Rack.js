@@ -25,7 +25,7 @@ class Rack extends React.Component {
 
     return (
       <div className='rack'>
-        <div className='racktitle'>{this.props.debug ? this.props.player : ''}</div>
+        {this.props.player && <div className='racktitle'>{this.props.player}</div>}
         {tiles}
       </div>
     );

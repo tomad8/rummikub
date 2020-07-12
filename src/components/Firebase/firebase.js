@@ -68,7 +68,13 @@ const config = {
     gamePlayer = (gameid, playerId) => this.db.ref(`games/${gameid}/players/${playerId}`);
     gamePlayers = (gameid) => this.db.ref(`games/${gameid}/players`);
 
-    
+    // *** DB - Game Player API ***
+    gameRack = (gameid, rackId) => this.db.ref(`games/${gameid}/racks/${rackId}`);
+    gameRacks = (gameid) => this.db.ref(`games/${gameid}/racks`);
+
+    // *** DB - generic ref ***
+    //root = () => this.db.ref();
+
 
   }
 

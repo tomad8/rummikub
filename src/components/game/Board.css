@@ -1,10 +1,11 @@
 
 
   .board {
-    background: white;
+    background: var(--board-color);
     /*border: 1px solid #999;*/
     border-radius: 3px;
-    margin: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    margin: 10px;
     padding: 5px;
     
     display: flex;

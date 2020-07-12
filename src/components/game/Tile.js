@@ -26,6 +26,10 @@ class Tile extends React.Component {
       className += ' tile-moved'
     }
 
+    if (this.props.fresh) {
+      className += ' tile-fresh'
+    }
+
     return className;
   }
 

@@ -8,12 +8,12 @@ class Lobby extends React.Component {
   
   render() {
     
-    const hostId = this.props.db.host;
+    const hostId = this.props.dbHost;
     const isHost = this.props.user && this.props.user.authUser && this.props.user.authUser.uid === hostId;
     
     const playerList = [];
-    if (this.props.db && this.props.db.players) {
-      for (const [playerId, player] of Object.entries(this.props.db.players)) {
+    if (this.props.dbPlayers) {
+      for (const [playerId, player] of Object.entries(this.props.dbPlayers)) {
       playerList.push(<li key={playerId}>{player.name}{playerId === hostId ? ' (host)' : ''}</li>)
       }
     }

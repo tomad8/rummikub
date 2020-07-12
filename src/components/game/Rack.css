@@ -1,11 +1,12 @@
 
 
   .rack {
-    background: white;
+    background: var(--rack-color);
     /*border: 1px solid #999;*/
     border-radius: 3px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     /*float: left;*/
-    margin: 5px;
+    margin: 10px;
     padding: 5px;
 
     display: flex;

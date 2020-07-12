@@ -2,17 +2,16 @@
   .joinpage {
     margin: auto;
     max-width: 1032px;
-    color: white;
     text-align: center;
     padding: 10px;
   }
 
   .joinbox  {
     display: inline-block;
-    background: var(--menu-background-color);
+    background: var(--panel-background-color);
     border: none;
     border-radius: 3px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.25);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     text-align: left;
     vertical-align: top;
     margin: 10px;
@@ -58,7 +57,7 @@
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     border: none;
     border-radius: 2px;
-    color: black;
+    color: var(--button-text-color);
     /*font-weight: bold;*/
     margin: 5px;
     padding: 8px;

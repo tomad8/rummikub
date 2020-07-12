@@ -1,32 +1,121 @@
-:root {  
+
+.theme-light {  
+  --body-background-color: white;
+  --title-color: rgb(100, 120, 156);
+  --heading-color: black;
+  --text-color: rgb(56, 74, 105);
+  --link-color: rgb(231, 139, 46);
+  --link-hover-color: rgb(255, 176, 86);
+  --note-color: rgb(56, 74, 105);
+
+  --emphasis-color-light: rgb(211, 168, 120);
+  --emphasis-color-dark: var(--link-color);
+
+  --menu-background-color: rgb(47, 52, 63);
+  --menu-text-color: rgb(145, 166, 202);
+  --menu-hover-background-color: rgba(69, 77, 95, 0.6);
+  --menu-active-background-color: rgba(69, 77, 95, 0.4);
+  
+  --panel-background-color: rgb(215, 221, 233); /*rgb(192, 201, 216); */
+  --panel-emphasis-background-color: var(--link-color);
+  --panel-emphasis-text-color: white; /*rgb(192, 201, 216); */
+      
+  --button-background: rgb(100, 120, 156);
+  --button-text-color: white;
+  --button-hover-background: rgb(123, 143, 177);
+  --button-active-background: rgb(73, 92, 124);
+  --button-disabled-background: rgb(181, 186, 196);
+
+  --highlight-color: rgb(33, 160, 214);
+  --highlight-fade-color: rgba(33, 160, 214, 0.5);
+  
+  --error-color: rgb(158, 21, 21);
+  --success-color: rgb(68, 170, 0);
+
+  --board-color: var(--panel-background-color);
+  --rack-color: var(--panel-background-color);
+
+  --set-background-color: rgb(234, 237, 243); 
+  --set-border-color: #aaa;
+  --set-hover-color: #777;
+  --set-empty-color: rgb(192, 201, 216);
+  
+  --tile-gradient-light: rgb(238, 238, 238);
+  --tile-gradient-dark: rgb(212, 212, 212);
+  --tile-border-color: #aaa;
+  --tile-hover-color: #777;
+  --tile-subscript-color: #ddd;
+  --tile-empty-color: var(--set-empty-color);
+  --tile-empty-text-color: var(--panel-background-color);
+  --tile-fresh-color: var(--emphasis-color-dark);
+  --tile-gray: gray;
+
+  --tile-black: black;
+  --tile-red: red;
+  --tile-blue: royalblue;
+  --tile-orange: darkorange;
+  --tile-purple: darkviolet;
+  --tile-pink: violet;
+
+}
+
+.theme-dark {  
   --body-background-color: rgb(40, 44, 52);
-  --title-color: rgb(145, 166, 202);
+  --title-color: rgb(151, 165, 192);
   --heading-color: white;
-  --text-color: rgb(145, 166, 202);
+  --text-color: var(--title-color);
   --link-color: rgb(204, 175, 141);
   --link-hover-color: rgb(220, 150, 70);
-  --note-color: rgb(145, 166, 202);
+  --note-color: var(--title-color);
 
-  --emphasis-color: rgb(204, 175, 141);
+  --emphasis-color-light: rgb(204, 175, 141);
+  --emphasis-color-dark: rgb(204, 175, 141);
 
-  --menu-background-color: rgb(46, 54, 66);
-  --menu-text-color: rgb(145, 166, 202);
-  --menu-hover-background-color: rgba(182, 202, 238, 0.1);
-  --menu-active-background-color: rgba(182, 202, 238, 0.2);
+  --menu-background-color: rgb(47, 52, 63);
+  --menu-text-color: var(--title-color);
+  --menu-hover-background-color: rgba(69, 77, 95, 0.6);
+  --menu-active-background-color: rgba(69, 77, 95, 0.4);
   
-  --button-background: rgb(135, 206, 235);
-  --button-hover-background: rgb(113, 178, 204);
-  --button-active-background: rgb(77, 123, 143);
+  --panel-background-color: rgb(47, 52, 63);
+  --panel-emphasis-background-color: var(--link-color);
+  --panel-emphasis-text-color: black; /*rgb(192, 201, 216); */
+  
+  --button-background: rgb(113, 178, 204);
+  --button-text-color: black;
+  --button-hover-background: rgb(135, 206, 235);
+  --button-active-background: rgb(92, 143, 165);
   --button-disabled-background: rgb(81, 88, 104);
 
   --highlight-color: rgb(33, 160, 214);
   --highlight-fade-color: rgba(33, 160, 214, 0.5);
   
   --error-color: rgb(255, 80, 80);
-
   --success-color: rgb(80, 233, 80);
 
+  --board-color: var(--menu-background-color);
+  --rack-color: var(--menu-background-color);
 
+  --set-background-color: var(--body-background-color);
+  --set-border-color:  rgb(32, 32, 32);
+  --set-hover-color:  rgb(130, 130, 130);
+  --set-empty-color:  var(--body-background-color);
+  
+  --tile-gradient-light: rgb(80, 80, 80);
+  --tile-gradient-dark: rgb(65, 65, 65);
+  --tile-border-color: rgb(60, 60, 60);
+  --tile-hover-color: rgb(130, 130, 130);
+  --tile-subscript-color: #ddd;
+  --tile-empty-color: var(--set-empty-color);
+  --tile-empty-text-color: var(--panel-background-color);
+  --tile-fresh-color: var(--emphasis-color-dark);
+  --tile-gray: rgb(0, 0, 0);
+
+  --tile-black: rgb(214, 214, 214);
+  --tile-red: rgb(236, 101, 101);
+  --tile-blue: rgb(109, 145, 255);
+  --tile-orange: rgb(238, 157, 58);
+  --tile-purple: rgb(209, 110, 255);
+  --tile-pink: rgb(13, 209, 13);
 }
 
 body {
@@ -43,7 +132,7 @@ body {
 
 h1, h2, h3 {
   color: var(--heading-color);
-  font-weight: lighter;
+  font-weight: normal;
 }
 
 h4, h5, h6 {
@@ -58,4 +147,31 @@ code {
 
 .error {
   color: var(--error-color);
+}
+
+.success {
+  color: var(--success-color);
+}
+
+.notification {
+  color: var(--text-color);
+  display: inline-block;
+  position: fixed;
+  width: 300px;
+  margin-left: -155px;
+  top: 18px;
+  background: var(--panel-background-color);
+  border: none;
+  border-radius: 3px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  padding: 5px;
+  animation: notification-fade 3s both;
+}
+
+@keyframes notification-fade {
+  0%   { top: 0px; opacity: 0; }
+  20%  { top: 18px; opacity: 1; }
+  80%  { top: 18px; opacity: 1; }
+  100% { top: 10px; opacity: 0; }
 }

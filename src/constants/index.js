@@ -6,7 +6,6 @@ export const NUMBER_OF_TILE_DECKS = 2;      // Official rules: 2
 export const NUMBER_OF_TILE_JOKERS = 8;     // Official rules: 2
 
 // Used in Game.js
-export const NUMBER_OF_PLAYERS = 4;             // Official rules: 2 to 4
 export const NUMBER_OF_INITIAL_RACK_TILES = 16; // Official rules: 14 (or 16)
 export const MIN_SCORE_FOR_FIRST_TURN = 1;      // Official rules: 30
 export const ALLOW_ALTER_BOARD_ON_FIRST_TURN = true; // Official rules: false

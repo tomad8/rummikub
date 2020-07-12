@@ -1,7 +1,7 @@
 
 
   .footerbg {
-    background: var(--menu-background-color);
+    background: var(--panel-background-color);
     width: 100%;
     overflow: hidden;
   }

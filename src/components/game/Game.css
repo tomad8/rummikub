@@ -3,7 +3,33 @@
   .game {
     text-align: center;
     padding: 0px;
-    
+  }
+  
+  .gameheader {
+    text-align: center;
+    margin-top: 5px;
+    padding: 0px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
+
+  .gamemessage {
+    background: none;
+    /*border: 1px solid #999;*/
+    /*border-radius: 5px;*/
+    margin-left: auto;
+    margin-right: 5px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
   }
 
   .note {

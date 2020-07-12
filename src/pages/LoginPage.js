@@ -57,9 +57,9 @@ class LoginFormBase extends React.Component {
 
     return (
       <div style={{padding: '10px', paddingTop: '50px'}} >
+        {error && <p className='error notification'>{error.message}</p>}
+        {status && <p className='notification'>{status}</p>}
         {loading && <Loading />}
-        {status && <p>{status}</p>}
-        {error && <p className='error'>{error.message}</p>}
       </div>
     );
   }
