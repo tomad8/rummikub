@@ -1,6 +1,7 @@
 import React from 'react';
 import './GamePage.css';
 import * as Utils from '../utils';
+import * as TileHelper from '../utils/tilehelper';
 import * as Constants from '../constants';
 import * as ROUTES from '../constants/routes';
 import { withRouter } from 'react-router-dom';
@@ -15,9 +16,7 @@ import NotFound from '../components/NotFound';
 const GamePage = () => (
   <AuthUserContext.Consumer>
     {user => (
-      <div className='gamepage'>
-        <GameForm user={user} />
-      </div>
+      <GameForm user={user} />
     )}
   </AuthUserContext.Consumer>
 );
@@ -45,6 +44,9 @@ class GameFormBase extends React.Component {
       dbRacks: [],
       dbSets: [],
       dbLatestMovedTile: null,
+      dbLastUpdateTime: null,
+      dbLastTurnTime: null,
+      localLatestMovedTile: null,
     };
   }
   
@@ -74,7 +76,7 @@ class GameFormBase extends React.Component {
               name: this.props.user.displayName,
               score: 0,
             },
-          }
+          },
         },
           () => {
             return this.dbSaveGame();
@@ -132,6 +134,8 @@ class GameFormBase extends React.Component {
           dbPrevRacks: snapshot.val().prevRacks,
           dbPrevSets: snapshot.val().prevSets,
           dbLatestMovedTile: snapshot.val().latestMovedTile,
+          dbLastUpdateTime: snapshot.val().lastUpdateTime,
+          dbLastTurnTime: snapshot.val().lastTurnTime,
           localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
           loading: false,
           listening: true,
@@ -159,6 +163,8 @@ class GameFormBase extends React.Component {
       players: this.state.dbPlayers,
       playerSequence: this.state.dbPlayerSequence,
       currentPlayer: this.state.dbCurrentPlayer,
+      /*lastUpdateTime: this.props.firebase.db.ServerValue.TIMESTAMP,
+      lastTurnTime: this.props.firebase.db.ServerValue.TIMESTAMP,*/
     };
     
     //these may be null, only add if they have value
@@ -176,7 +182,7 @@ class GameFormBase extends React.Component {
     if (this.state.dbLatestMovedTile) {
       data['latestMovedTile'] = this.state.dbLatestMovedTile;
     }
-    
+
     this.setState({ saving: true });
     
     return this.props.firebase
@@ -197,7 +203,9 @@ class GameFormBase extends React.Component {
               this.props.history.replace(ROUTES.GAME + '/' + gameId); 
             }
             if (!this.state.listening) {
-              this.dbLoadGame(gameId, this.loadComplete);
+              if ((!this.state.gameInProgress || this.state.localPlayer !== this.state.dbCurrentPlayer)) {
+                this.dbLoadGame(gameId, this.loadComplete); //start listening
+              }
             }
           }
         })
@@ -217,11 +225,16 @@ class GameFormBase extends React.Component {
     const gameId = this.state.gameId;
     
     const updates = {};
-    updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
-    updates['/racks/' + this.state.localPlayer] = this.state.dbRacks[this.state.localPlayer];
+    if (this.state.dbLatestMovedTile) {
+      updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
+    }
+    if (this.state.dbRacks[this.state.localPlayer]) {
+      updates['/racks/' + this.state.localPlayer] = this.state.dbRacks[this.state.localPlayer];
+    }
     if (this.state.dbSets) {
       updates['/sets'] = this.state.dbSets;
     }
+    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
     
     return this.props.firebase
       .game(gameId)
@@ -251,8 +264,10 @@ class GameFormBase extends React.Component {
     const gameId = this.state.gameId;
     
     const updates = {};
-    updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
     updates['/currentPlayer'] = this.state.dbCurrentPlayer;
+    if (this.state.dbLatestMovedTile) {
+      updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
+    }
     if (this.state.dbTileBag) {
       updates['/tileBag'] = this.state.dbTileBag;
     }
@@ -264,7 +279,9 @@ class GameFormBase extends React.Component {
       updates['/sets'] = this.state.dbSets;
       updates['/prevSets'] = this.state.dbSets;
     }
-    
+    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;
+    updates['/lastTurnTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
+
     return this.props.firebase
       .game(gameId)
       .update(updates)
@@ -289,24 +306,24 @@ class GameFormBase extends React.Component {
         });
   }
 
-  // Add a player to the game
-  dbAddGamePlayer(gameId, playerId, data) {
+  // Add/update a player in the game
+  dbUpdateGamePlayer(gameId, playerId, data) {
     return this.props.firebase
       .gamePlayer(gameId, playerId)
-      .set(data)
+      .update(data)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully added player ' + playerId + ' to game ' + gameId);
-          if (this._isMounted) {
-            this.setState({ status: 'Joined game', error: null,});
-          }
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated player ' + playerId + ' in game ' + gameId);
+          //if (this._isMounted) {
+          //  this.setState({ status: 'Joined game', error: null,});
+          //}
         })
       .catch(
         error => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to add player ' + playerId + ' to game ' + gameId + ': ' + error.code + ' - ' + error.message);
-          if (this._isMounted) {
-            this.setState({ status: 'Failed to join game', error: error });
-          }
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to updated player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          //if (this._isMounted) {
+          //  this.setState({ status: 'Failed to join game', error: error });
+          //}
         });
   }
 
@@ -320,14 +337,17 @@ class GameFormBase extends React.Component {
       }
       else {
         if (process.env.NODE_ENV !== 'production') console.log('User ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName  + ' is already a player in this game');
-      
-        if (this.state.localPlayer === this.state.dbCurrentPlayer) {
+        
+        if (this.state.gameInProgress && this.state.localPlayer === this.state.dbCurrentPlayer) {
           this.dbStopListening(); //because its our turn - we're gonna be pushing all the updates!
+        }
+
+        if (this.state.dbPlayers[this.props.user.authUser.uid].name !== this.props.user.displayName) {
+          this.updateGamePlayerName();
         }
       }
     }
   }
-
 
   addUserToGame() {
     if (process.env.NODE_ENV !== 'production') console.log('Adding new user ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName + ' to game');
@@ -343,7 +363,25 @@ class GameFormBase extends React.Component {
       }
     },
       () => {
-        return this.dbAddGamePlayer(this.state.gameId, this.props.user.authUser.uid, newPlayer);
+        return this.dbUpdateGamePlayer(this.state.gameId, this.props.user.authUser.uid, newPlayer);
+      }
+    );
+  }
+
+  updateGamePlayerName() {
+    if (process.env.NODE_ENV !== 'production') console.log('Updating GamePlayerName to ' + this.props.user.displayName);
+    
+    let player = {
+      name: this.props.user.displayName,
+    };
+
+    this.setState({ 
+      dbPlayers: {
+        [this.props.user.authUser.uid]: player
+      }
+    },
+      () => {
+        return this.dbUpdateGamePlayer(this.state.gameId, this.props.user.authUser.uid, player);
       }
     );
   }
@@ -389,12 +427,14 @@ class GameFormBase extends React.Component {
       dbCurrentPlayer: 0,
       dbTileBag: tiles,
       dbRacks: racks,
+      dbPrevRacks: racks,
       dbSets: [],
+      dbPrevSets: [],
       dbLatestMovedTile: null,
       /*localSelectedTile: null,
       localSelectedSet: null,*/
       localPlayer: playerSequence.indexOf(this.props.user.authUser.uid),
-    }, 
+      }, 
       () => {
         return this.dbSaveGame();
       }
@@ -413,7 +453,10 @@ class GameFormBase extends React.Component {
   }
 
   resetTurn() {
-    const sets = this.state.dbPrevSets.slice();
+    let sets = [];
+    if (this.state.dbPrevSets) {
+      sets = this.state.dbPrevSets.slice();
+    }
     const racks = this.state.dbRacks.slice();
     racks[this.state.localPlayer] = this.state.dbPrevRacks[this.state.localPlayer].slice();
 
@@ -427,7 +470,7 @@ class GameFormBase extends React.Component {
     );
   }
 
-  CompleteTurn() {
+  completeTurn() {
     const nextPlayer = this.state.dbCurrentPlayer + 1 >= this.state.dbPlayerSequence.length 
       ? 0 
       : this.state.dbCurrentPlayer + 1;
@@ -441,10 +484,19 @@ class GameFormBase extends React.Component {
   }
 
   moveTileFromBagToRackAndSkipTurn() {
-    let racks = this.state.dbRacks;
+    let racks = this.state.dbRacks.slice();
+    let sets = this.state.dbSets;
+    const setTilesMoved = JSON.stringify(this.state.dbSets) !== JSON.stringify(this.state.dbPrevSets);
+    if (setTilesMoved) {
+      if (this.state.dbPrevSets) {
+        sets = this.state.dbPrevSets.slice();
+      }
+      racks[this.state.localPlayer] = this.state.dbPrevRacks[this.state.localPlayer].slice();
+    
+    }
+    
     let bag = this.state.dbTileBag;
     let tileId = null;
-
     if (this.state.dbTileBag.length > 0) {
       if (this.state.dbRacks) {
         bag = this.state.dbTileBag.slice();
@@ -454,7 +506,7 @@ class GameFormBase extends React.Component {
         this.logDebug('Moving Tile ID ' + tileId + ' from Bag to Rack');
         
         //const targetTileId = this.state.racks[this.state.localPlayer][rackPosition];
-        racks = this.addTileToRack(tileId, null, null);
+        racks = this.addTileToRack(tileId, null, racks);
       }
     }
     else {
@@ -468,6 +520,7 @@ class GameFormBase extends React.Component {
     
     this.setState({
       dbTileBag: bag,
+      dbSets: sets,
       dbRacks: racks,
       dbCurrentPlayer: nextPlayer,
       dbLatestMovedTile: tileId,
@@ -526,7 +579,46 @@ class GameFormBase extends React.Component {
     
     this.setState({
       dbRacks: racks,
-      dbLatestMovedTile: tileId,
+      localLatestMovedTile: tileId,
+    },
+      this.dbSaveGameUpdate
+    );
+  } 
+
+  sortRack(byRank) {
+    this.logDebug('Sorting rack');
+    
+    const racks = this.state.dbRacks.slice();
+    const localRack = racks[this.state.localPlayer].slice();
+    
+    function compareRankThenSuit(a, b) {
+      const rankDiff = TileHelper.getTileRankFromIdSort(a) - TileHelper.getTileRankFromIdSort(b);
+      if (rankDiff === 0) {
+        return TileHelper.getTileSuitFromIdSort(a) - TileHelper.getTileSuitFromIdSort(b);
+      }
+      return rankDiff;
+    }
+
+    function compareSuitThenRank(a, b) {
+      const suitDiff = TileHelper.getTileSuitFromIdSort(a) - TileHelper.getTileSuitFromIdSort(b);
+      if (suitDiff === 0) {
+        return TileHelper.getTileRankFromIdSort(a) - TileHelper.getTileRankFromIdSort(b);
+      }
+      return suitDiff;
+    }
+
+    if (byRank) {
+      localRack.sort(compareRankThenSuit);
+    }
+    else {
+      localRack.sort(compareSuitThenRank);
+    }
+
+    racks[this.state.localPlayer] = localRack;
+
+    this.setState({
+      dbRacks: racks,
+      localLatestMovedTile: null,
     },
       this.dbSaveGameUpdate
     );
@@ -697,13 +789,21 @@ class GameFormBase extends React.Component {
   }
 
   handleClickCompleteTurn() {
-    this.CompleteTurn();
-
+    this.completeTurn();
   }
 
   handleClickSkipTurn() {
     this.moveTileFromBagToRackAndSkipTurn();
+  }
 
+  handleClickSortByRank() {
+    // e.g. 11 22 33
+    this.sortRack(true);
+  }
+
+  handleClickSortBySuit() {
+    // e.g. 123 123
+    this.sortRack(false);
   }
 
   handleSetValidityUpdate(invalidCount) {
@@ -732,32 +832,32 @@ class GameFormBase extends React.Component {
     
     if (this.state.dbCurrentPlayer === this.state.localPlayer){
       //if our turn...
-      const tilesPlaced = (this.state.dbRacks && this.state.dbPrevRacks 
+
+      const rackTilesPlaced = (this.state.dbRacks && this.state.dbPrevRacks 
         && this.state.dbRacks[this.state.localPlayer].filter(t => t>=0).length 
           < this.state.dbPrevRacks[this.state.localPlayer].filter(t => t>=0).length);
-        
-
-      if (tilesPlaced) {
+      
+      const setTilesMoved = JSON.stringify(this.state.dbSets) !== JSON.stringify(this.state.dbPrevSets);
+      
+      if (rackTilesPlaced || setTilesMoved) {
         //if tiles placed...
         buttons.push({
           id: 'reset', 
           label: 'Reset Turn', 
           onClick: () => this.handleClickResetTurn(),
         });
-
-        if (this.state.invalidSetCount === 0) {
-          //if tiles placed and board is valid...
-          buttons.push({
-            id: 'complete', 
-            label: 'Complete Turn', 
-            className: 'successbutton',
-            onClick: () => this.handleClickCompleteTurn(),
-          });
-        }
       }
 
-      if (!tilesPlaced || this.state.invalidSetCount > 0) {
-        //if tiles not placed or board is not valid...
+      if (rackTilesPlaced && this.state.invalidSetCount === 0) {
+        //if tiles placed and board is valid...
+        buttons.push({
+          id: 'complete', 
+          label: 'Complete Turn', 
+          className: 'successbutton',
+          onClick: () => this.handleClickCompleteTurn(),
+        });
+      }
+      else {
         buttons.push({
           id: 'skip', 
           label: 'Skip Turn', 
@@ -766,6 +866,27 @@ class GameFormBase extends React.Component {
       }
     }
 
+    return buttons;
+  }
+
+  getRackButtons() {
+    const buttons = [];
+    
+    if (this.state.dbRacks[this.state.localPlayer] 
+        && this.state.dbRacks[this.state.localPlayer].length > 0) {
+      buttons.push({
+        id: 'sortByRank', 
+        label: 'Sort 11 22 33', 
+        onClick: () => this.handleClickSortByRank(),
+      });
+
+      buttons.push({
+        id: 'sortBySuit', 
+        label: 'Sort 123 123', 
+        onClick: () => this.handleClickSortBySuit(),
+      });
+
+    }
     return buttons;
   }
 
@@ -783,7 +904,9 @@ class GameFormBase extends React.Component {
         dbLatestMovedTile = {this.state.dbLatestMovedTile}
         uid = {this.props.user.authUser && this.props.user.authUser.uid}
         localPlayer = {this.state.localPlayer}
+        localLatestMovedTile = {this.state.localLatestMovedTile}
         buttons={this.getActionBarButtons()}
+        rackButtons={this.getRackButtons()}
         onMoveTileFromRackToSet={(tileId, setId) => this.moveTileFromRackToSet(tileId, setId)}
         onMoveTileFromSetToRack={(tileId, setId, targetTileId) => this.moveTileFromSetToRack(tileId, setId, targetTileId)}
         onMoveTileFromSetToSet={(tileId, setId, targetSetId) => this.moveTileFromSetToSet(tileId, setId, targetSetId)}
@@ -803,14 +926,14 @@ class GameFormBase extends React.Component {
       />;
 
       return (
-      <div>
+      <div className='gamepage'>
         {this.state.error && <p className='error notification'>{this.state.error.message}</p>}
         {this.state.status && <p className='notification'>{this.state.status}</p>}
         {(this.state.dbHost) ? 
           (this.state.dbGameInProgress ? gameComponent : lobbyComponent) :
           !this.state.loading && <NotFound />}
-        {(this.state.loading) && <div style={{padding: '10px', paddingTop: '50px'}} ><Loading /></div>}
-        {(this.state.saving) && <div style={{padding: '10px', paddingTop: '10px'}} ><Loading inLine={true} /></div>}
+        {(this.state.loading) && <Loading />}
+        {(this.state.saving) && <Loading inTitle={true} />}
       </div>
     );
   }

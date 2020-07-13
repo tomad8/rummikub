@@ -568,7 +568,7 @@ class Game extends React.Component {
         id: tileId, 
         selected: selected, 
         clickable: clickable, 
-        justMoved: (tileId === this.props.dbLatestMovedTile),
+        justMoved: (tileId === this.props.dbLatestMovedTile || tileId === this.props.localLatestMovedTile),
         debug: this.state.debugMode,
       });
     }
@@ -633,22 +633,19 @@ class Game extends React.Component {
     const tilesInBag = this.props.dbTileBag && this.props.dbTileBag.length;
     
     const playerName = this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
+    
     let message = '';
+    let gameClassName = 'game';
     if (this.props.dbCurrentPlayer === this.props.localPlayer) {
-     /* if (this.state.localSelectedTile === null) {
-        message = "It's your turn! Tap a tile to pick it up";
-      }
-      else {
-        message = "It's your turn! Tap somewhere to move it";
-      }*/
-      message = <div className='gamemessage'><strong>{playerName + ", it's your turn!"}</strong></div>;
+      message = <div className='gamemessage gamemessage-currentturn'>{playerName + ", it's your turn!"}</div>;
+      gameClassName = 'game game-currentturn';
     }
     else {
       message = <div className='gamemessage'>{"Waiting for " + playerName + " to take their turn..."}</div>;
     }
 
     return (
-      <div className="game">
+      <div className={gameClassName}>
         <div className="gameheader">
           <GamePlayers
             playerSequence={this.props.dbPlayerSequence}
@@ -657,29 +654,30 @@ class Game extends React.Component {
             currentPlayer={this.props.dbCurrentPlayer}
             uid={this.props.uid}
             tileCounts={this.getTileCounts()} 
-            />
-          {message}
-          <ActionBar
-            buttons={this.props.buttons} />
-        </div>
-        <Board 
-          sets={this.getSets()}
-          debug={this.state.debugMode}
-          onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
-          onClickSet={(setId) => this.handleClickSet(setId)}
-          onSetValidityUpdate={(invalidCount) => this.props.onSetValidityUpdate(invalidCount)}
-        />
-        {/*<div className='actionbar'>
-          <button className='actionbutton' onClick={() => this.moveTileFromBagToRack()}>Take Tile From Bag</button>
-        </div>*/}
-        <Rack 
-            player={null}
-            tiles={this.getTilesRack(null)}
-            debug={this.state.debugMode}
-            onClick={(tileId) => this.handleClickRackTile(tileId)}
           />
-        
-        <div className='note'>
+          <div className="message-and-actionbar">
+            {message}
+            <ActionBar
+              buttons={this.props.buttons} />
+          </div>
+        </div>
+        <div className="gamebody">
+          <Board 
+            sets={this.getSets()}
+            debug={this.state.debugMode}
+            onClickTile={(tileId, setId) => this.handleClickSetTile(tileId, setId)}
+            onClickSet={(setId) => this.handleClickSet(setId)}
+            onSetValidityUpdate={(invalidCount) => this.props.onSetValidityUpdate(invalidCount)}
+          />
+          <Rack 
+              player={null}
+              tiles={this.getTilesRack(null)}
+              debug={this.state.debugMode}
+              onClick={(tileId) => this.handleClickRackTile(tileId)}
+              buttons={this.props.rackButtons}
+            />
+        </div>
+        <div className='gamenote'>
           {Constants.NUMBER_OF_TILE_DECKS} decks
           • {Constants.NUMBER_OF_TILE_SUITS} colours (suits)
           • {Constants.NUMBER_OF_TILE_RANKS} numbers (ranks)

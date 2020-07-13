@@ -12,14 +12,21 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; /*flex-start;*/
     align-items: center;
     align-content: center;
   }
 
   .racktitle {
-    
     margin: 0px;
     padding: 5px;
+    flex-basis: 100%;
+  }
+
+  .rackbuttons {
+    /*margin-top: auto;
+    margin-left: auto;
+    margin-right: 0px;
+    align-self: flex-end;*/
     flex-basis: 100%;
   }

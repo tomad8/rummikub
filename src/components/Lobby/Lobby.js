@@ -32,7 +32,7 @@ class Lobby extends React.Component {
         </div>
         <div className="lobbybody">
           <div className="lobbychangename">
-            <h3>Set your display name</h3>
+            <h3>Change your display name</h3>
             <ChangeName 
               user = {this.props.user}
               gameId = {this.props.gameId}

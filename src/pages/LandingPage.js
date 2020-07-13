@@ -2,7 +2,6 @@ import React from 'react';
 import './LandingPage.css';
 import {Link} from 'react-router-dom';
 import * as ROUTES from '../constants/routes';
-import Footer from '../components/Footer';
 
 class LandingPage extends React.Component {
   
@@ -25,11 +24,10 @@ class LandingPage extends React.Component {
             <p className='note'>
               Each player will need their own device to play on. Anything with a modern web browser should do it.</p>
             <p className='note'>
-              Wikipedia has the <a href='https://en.wikipedia.org/wiki/Rummikub#Rules'>rules of the game</a> if you're in need of a refresher.</p>
+              Wikipedia has the <a href='https://en.wikipedia.org/wiki/Rummikub#Rules'>rules of the game</a> if you need a refresher.</p>
             <p className='note'>
               Enjoy <strong>㋡</strong></p>
         </div>
-        <Footer />
       </div>
     );
   }

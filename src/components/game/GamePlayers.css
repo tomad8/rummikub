@@ -4,7 +4,7 @@
     background: none;
     /*border: 1px solid #999;*/
     /*border-radius: 5px;*/
-    margin-left: 5px;
+    margin-left: 0px;
     margin-right: auto;
     padding: 0px;
     display: flex;
@@ -23,7 +23,7 @@
     padding: 0px;
     padding-left: 10px;
     padding-right: 0px;
-    font-size: 12pt;
+    font-size: 11pt;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -41,7 +41,7 @@
     padding: 0px;
     padding-left: 10px;
     padding-right: 0px;
-    font-size: 12pt;
+    font-size: 11pt;
     color: var(--panel-emphasis-text-color);
     display: flex;
     flex-direction: row;
@@ -49,11 +49,24 @@
     justify-content: center;
     align-items: baseline;
     align-content: center;
+    animation: current-flash 1s both;
+  }
+
+  @keyframes current-flash {
+    0% { background: var(--panel-background-color); color: var(--text-color); }
+    10% { background: var(--panel-emphasis-background-color); color: var(--panel-emphasis-text-color); }
+    20% { background: var(--panel-emphasis-background-color); color: var(--panel-emphasis-text-color); }
+    39% { background: var(--panel-background-color); color: var(--text-color); }
+    40% { background: var(--panel-background-color); color: var(--text-color); }
+    50% { background: var(--panel-emphasis-background-color); color: var(--panel-emphasis-text-color); }
+    60% { background: var(--panel-emphasis-background-color); color: var(--panel-emphasis-text-color); }
+    70% { background: var(--panel-background-color); color: var(--text-color); }
+    80% { background: var(--panel-background-color); color: var(--text-color); }
+    90% { background: var(--panel-emphasis-background-color); color: var(--panel-emphasis-text-color); }
   }
 
   .player-host {
     padding-left: 3px;
-    color: var(--note-color);
     font-size: 9pt;
     /*font-weight: bold;*/
   }

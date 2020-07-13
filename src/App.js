@@ -11,6 +11,7 @@ import GamePage from './pages/GamePage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
+import Footer from './components/Footer';
 
 const App = () => (
   <Router>
@@ -19,10 +20,28 @@ const App = () => (
 )
 
 class AppFormBase extends React.Component {
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      themeToggleLabel: document.getElementsByTagName('body')[0].className === 'theme-light' ? 'Dark mode' : 'Light mode',
+    };
+  }
+
   componentDidMount() {
     if (!this.props.authUser /*&& this.props.location.pathname === ROUTES.LANDING*/) {
       this.props.history.push(ROUTES.LOGIN);
+    }
+  }
+
+  handleThemeToggle () {
+    let body = document.getElementsByTagName('body')[0];
+    if (body.className === 'theme-light') {
+      body.className = 'theme-dark';
+      this.setState({themeToggleLabel: 'Light mode',});
+    }
+    else {
+      body.className = 'theme-light';
+      this.setState({themeToggleLabel: 'Dark mode',});
     }
   }
 
@@ -44,7 +63,10 @@ class AppFormBase extends React.Component {
           {/*<Route path={ROUTES.PROFILE} render={(routeProps) => (<ProfilePage {...routeProps} authUser={this.state.authUser} />)} />*/}
           <Route component={NotFound} />
         </Switch>
-        {/*<Footer />*/}
+        <Footer 
+          themeToggleLabel={this.state.themeToggleLabel}
+          onThemeToggle={() => this.handleThemeToggle()}
+          />
       </div> 
     );
   }

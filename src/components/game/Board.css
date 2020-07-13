@@ -6,7 +6,7 @@
     border-radius: 3px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
     margin: 10px;
-    padding: 5px;
+    padding: 0px;
     
     display: flex;
     flex-direction: row;

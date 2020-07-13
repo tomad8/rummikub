@@ -1,6 +1,7 @@
 import React from 'react';
 import './Rack.css';
 import Tile from './Tile';
+import ActionBar from './ActionBar';
 
 class Rack extends React.Component {
   
@@ -27,6 +28,10 @@ class Rack extends React.Component {
       <div className='rack'>
         {this.props.player && <div className='racktitle'>{this.props.player}</div>}
         {tiles}
+        <div className="rackbuttons">
+          <ActionBar
+          buttons={this.props.buttons} />
+        </div>
       </div>
     );
   }

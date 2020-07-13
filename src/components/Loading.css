@@ -23,16 +23,27 @@
     margin-bottom: 10px;
   }
 
-  .loadingspinner-absolute {
+  .loadingspinner-fixed {
     display: inline-block;
     position: fixed;
     margin-left: calc( -2 * var(--offset));
     top: 100px;
   }
 
+  .loadingspinner-title {
+    --square: 10px;
+    --offset: 12px;
+    display: inline-block;
+    position: fixed;
+    margin-left: calc( -2 * var(--offset));
+    top: -2px;
+  }
+
   .loadingspinner-inline {
     position: relative;
   }
+
+
 
   .loadingspinner div {
     display: inline-block;

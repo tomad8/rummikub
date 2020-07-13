@@ -30,6 +30,11 @@ class ProfileFormBase extends React.Component {
     };
   }
 
+  nameChangeComplete() {
+     //go back to previous screen on completion of name change
+     this.props.history.goBack(); 
+  }
+
   render() {
     let userDetails;
 
@@ -40,7 +45,9 @@ class ProfileFormBase extends React.Component {
             <h2>Change your display name</h2>
           </div>
           <div className="profilebox">
-            <ChangeName user = {this.props.user}/>
+            <ChangeName 
+              user = {this.props.user}
+              callback = {() => this.nameChangeComplete()}/>
           </div>
           <div>
             <p>Login information</p>

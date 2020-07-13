@@ -1,23 +1,30 @@
+:root {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
 
 .theme-light {  
   --body-background-color: white;
   --title-color: rgb(100, 120, 156);
   --heading-color: black;
   --text-color: rgb(56, 74, 105);
-  --link-color: rgb(231, 139, 46);
+  --link-color: rgb(231, 116, 0);
   --link-hover-color: rgb(255, 176, 86);
   --note-color: rgb(56, 74, 105);
 
   --emphasis-color-light: rgb(211, 168, 120);
-  --emphasis-color-dark: var(--link-color);
+  --emphasis-color-dark: rgb(231, 116, 0);
 
   --menu-background-color: rgb(47, 52, 63);
   --menu-text-color: rgb(145, 166, 202);
   --menu-hover-background-color: rgba(69, 77, 95, 0.6);
-  --menu-active-background-color: rgba(69, 77, 95, 0.4);
+  --menu-active-background-color: rgba(69, 77, 95, 0.2);
   
-  --panel-background-color: rgb(215, 221, 233); /*rgb(192, 201, 216); */
-  --panel-emphasis-background-color: var(--link-color);
+  --panel-background-color: rgb(215, 221, 233); /*rgb(215, 221, 233);*/
+  --panel-emphasis-background-color: var(--emphasis-color-dark);
   --panel-emphasis-text-color: white; /*rgb(192, 201, 216); */
       
   --button-background: rgb(100, 120, 156);
@@ -32,19 +39,19 @@
   --error-color: rgb(158, 21, 21);
   --success-color: rgb(68, 170, 0);
 
-  --board-color: var(--panel-background-color);
-  --rack-color: var(--panel-background-color);
+  --board-color: rgba(182, 192, 212, 0.5); /*rgb(215, 221, 233);*/
+  --rack-color: rgba(182, 192, 212, 0.5); /*rgb(215, 221, 233);*/
 
   --set-background-color: rgb(234, 237, 243); 
   --set-border-color: #aaa;
   --set-hover-color: #777;
   --set-empty-color: rgb(192, 201, 216);
   
-  --tile-gradient-light: rgb(238, 238, 238);
-  --tile-gradient-dark: rgb(212, 212, 212);
-  --tile-border-color: #aaa;
-  --tile-hover-color: #777;
-  --tile-subscript-color: #ddd;
+  --tile-gradient-light: rgb(238, 224, 209);
+  --tile-gradient-dark: rgb(212, 199, 185);
+  --tile-border-color: rgb(170, 160, 149);
+  --tile-hover-color: rgb(119, 111, 102);
+  --tile-subscript-color: rgb(206, 192, 176);
   --tile-empty-color: var(--set-empty-color);
   --tile-empty-text-color: var(--panel-background-color);
   --tile-fresh-color: var(--emphasis-color-dark);
@@ -69,7 +76,7 @@
   --note-color: var(--title-color);
 
   --emphasis-color-light: rgb(204, 175, 141);
-  --emphasis-color-dark: rgb(204, 175, 141);
+  --emphasis-color-dark: rgb(220, 150, 70);
 
   --menu-background-color: rgb(47, 52, 63);
   --menu-text-color: var(--title-color);
@@ -77,7 +84,7 @@
   --menu-active-background-color: rgba(69, 77, 95, 0.4);
   
   --panel-background-color: rgb(47, 52, 63);
-  --panel-emphasis-background-color: var(--link-color);
+  --panel-emphasis-background-color: var(--emphasis-color-dark);
   --panel-emphasis-text-color: black; /*rgb(192, 201, 216); */
   
   --button-background: rgb(113, 178, 204);
@@ -92,19 +99,19 @@
   --error-color: rgb(255, 80, 80);
   --success-color: rgb(80, 233, 80);
 
-  --board-color: var(--menu-background-color);
-  --rack-color: var(--menu-background-color);
+  --board-color: rgba(51, 60, 77, 0.5);
+  --rack-color: rgba(51, 60, 77, 0.5);
 
   --set-background-color: var(--body-background-color);
   --set-border-color:  rgb(32, 32, 32);
-  --set-hover-color:  rgb(130, 130, 130);
+  --set-hover-color:  rgb(138, 126, 116);
   --set-empty-color:  var(--body-background-color);
   
-  --tile-gradient-light: rgb(80, 80, 80);
-  --tile-gradient-dark: rgb(65, 65, 65);
-  --tile-border-color: rgb(60, 60, 60);
-  --tile-hover-color: rgb(130, 130, 130);
-  --tile-subscript-color: #ddd;
+  --tile-gradient-light: rgb(80, 73, 67);
+  --tile-gradient-dark: rgb(65, 60, 55);
+  --tile-border-color: rgb(32, 32, 32);
+  --tile-hover-color: rgb(138, 126, 116);
+  --tile-subscript-color: rgb(50, 50, 50);
   --tile-empty-color: var(--set-empty-color);
   --tile-empty-text-color: var(--panel-background-color);
   --tile-fresh-color: var(--emphasis-color-dark);
@@ -120,6 +127,7 @@
 
 body {
   margin: 0;
+  height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -152,6 +160,8 @@ code {
 .success {
   color: var(--success-color);
 }
+
+
 
 .notification {
   color: var(--text-color);

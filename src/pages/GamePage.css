@@ -2,8 +2,8 @@
 
   .gamepage {
     margin: auto;
-    max-width: 1032px;
+    max-width: 1048px;
     text-align: center;
+    /*height: calc(100% - 50px);*/
   }
 
-  

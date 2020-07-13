@@ -1,11 +1,11 @@
 import React from 'react';
 import './Footer.css';
 
-const Footer = () => (
+const Footer = (props) => (
   <div className='footerbg'> 
     <div className='footer'> 
       {
-        "Made by Tom Adey."
+        "Made by Tom Adey.  "
       /*[
         "Made by Tom Adey.",
         "Built by Tom Adey.",
@@ -29,6 +29,7 @@ const Footer = () => (
         "Tom Adey. That's Numberwang.",
       ]*/
       }
+      <span className="footertextlink" onClick={props.onThemeToggle}>{props.themeToggleLabel}</span>
     </div>
   </div>
 );
