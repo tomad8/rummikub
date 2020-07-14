@@ -24,7 +24,7 @@ class ChangeName extends React.Component {
         })
       .then(
         () => {
-          console.log('Sucessfully updated user displayName to: ' + this.state.displayName)
+          if (process.env.NODE_ENV !== 'production') console.log('Sucessfully updated user displayName to: ' + this.state.displayName)
           this.props.firebase.doLogEvent('change_username', null)
           this.setState({ error: null, });
           //update game player too
@@ -32,7 +32,7 @@ class ChangeName extends React.Component {
         })
       .catch(
         error => {
-          console.log('Failed to update user displayName: ' + error.code + ' - ' + error.message)
+          console.error('Failed to update user displayName: ' + error.code + ' - ' + error.message)
           this.setState({ error: error });
         });
   }
@@ -46,7 +46,7 @@ class ChangeName extends React.Component {
           })
         .then(
           () => {
-            console.log('Sucessfully updated gameplayer displayName to: ' + this.state.displayName)
+            if (process.env.NODE_ENV !== 'production') console.log('Sucessfully updated gameplayer displayName to: ' + this.state.displayName)
             this.setState({ error: null, });
             //callback on name update completion
             if (this.props.callback) {
@@ -55,7 +55,7 @@ class ChangeName extends React.Component {
           })
         .catch(
           error => {
-            console.log('Failed to update gameplayer displayName: ' + error.code + ' - ' + error.message)
+            console.error('Failed to update gameplayer displayName: ' + error.code + ' - ' + error.message)
             this.setState({ error: error });
           });
     }
@@ -78,10 +78,11 @@ class ChangeName extends React.Component {
     } = this.state;
 
     const isInvalid =
+      !displayName ||
       !displayName.trim() ||
       displayName.trim().length > 20;
     
-    const isAmended = displayName.trim() !== this.props.user.displayName;
+    const isAmended = displayName && displayName.trim() !== this.props.user.displayName;
 
     return (
       <div className="changename">

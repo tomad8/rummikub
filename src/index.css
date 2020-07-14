@@ -10,10 +10,10 @@
   --body-background-color: white;
   --title-color: rgb(100, 120, 156);
   --heading-color: black;
-  --text-color: rgb(56, 74, 105);
+  --text-color: rgb(100, 120, 156);
   --link-color: rgb(231, 116, 0);
   --link-hover-color: rgb(255, 176, 86);
-  --note-color: rgb(56, 74, 105);
+  --note-color: rgb(100, 120, 156);
 
   --emphasis-color-light: rgb(211, 168, 120);
   --emphasis-color-dark: rgb(231, 116, 0);

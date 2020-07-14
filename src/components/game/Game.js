@@ -632,8 +632,11 @@ class Game extends React.Component {
     //const availableTiles = this.props.dbPlayerSequence && (TileHelper.getTotalTileCount() - (this.props.dbPlayerSequence.length - 1) * Constants.NUMBER_OF_INITIAL_RACK_TILES);
     const tilesInBag = this.props.dbTileBag && this.props.dbTileBag.length;
     
-    const playerName = this.props.dbPlayers && this.props.dbPlayerSequence &&
-      this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
+    let playerName;
+    if (this.props.dbPlayers && this.props.dbPlayerSequence && this.props.dbCurrentPlayer >=0 &&
+      this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]]) {
+      playerName = this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
+    }
     
     let message = '';
     let gameClassName = 'game';

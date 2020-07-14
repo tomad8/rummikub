@@ -29,7 +29,7 @@ class GameFormBase extends React.Component {
     super(props);
     this.state = {
       gameId: null,
-      loading: false,
+      loading: true,
       saving: false,
       listening: false,
       error: null,
@@ -57,6 +57,7 @@ class GameFormBase extends React.Component {
     
     // Only continue if user is authenticated. 
     // If user is not authenticated then login redirect will handle it and return to this page in a moment
+    if (process.env.NODE_ENV !== 'production') console.log('authUser: ' + this.props.user.authUser)
     if (this.props.user.authUser) {
       
       // Create Game
@@ -120,29 +121,40 @@ class GameFormBase extends React.Component {
     .on('value', snapshot => {
       let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
       if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
-      if (this._isMounted && snapshot.val()) {
-        this.setState({
-          /*db: snapshot.val(),*/
-          dbHost: snapshot.val().host,
-          dbGameInProgress: snapshot.val().gameInProgress, 
-          dbPlayers: snapshot.val().players,
-          dbPlayerSequence: snapshot.val().playerSequence,
-          dbCurrentPlayer: snapshot.val().currentPlayer,
-          dbTileBag: snapshot.val().tileBag,
-          dbRacks: snapshot.val().racks,
-          dbSets: snapshot.val().sets,
-          dbPrevRacks: snapshot.val().prevRacks,
-          dbPrevSets: snapshot.val().prevSets,
-          dbLatestMovedTile: snapshot.val().latestMovedTile,
-          dbLastUpdateTime: snapshot.val().lastUpdateTime,
-          dbLastTurnTime: snapshot.val().lastTurnTime,
-          localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
-          loading: false,
-          listening: true,
-          gameId: gameId, 
-          error: null,
-          status: status,
-        }, callback)
+      if (this._isMounted) {
+        if (snapshot.val()) {
+          this.setState({
+            /*db: snapshot.val(),*/
+            dbHost: snapshot.val().host,
+            dbGameInProgress: snapshot.val().gameInProgress, 
+            dbPlayers: snapshot.val().players,
+            dbPlayerSequence: snapshot.val().playerSequence,
+            dbCurrentPlayer: snapshot.val().currentPlayer,
+            dbTileBag: snapshot.val().tileBag,
+            dbRacks: snapshot.val().racks,
+            dbSets: snapshot.val().sets,
+            dbPrevRacks: snapshot.val().prevRacks,
+            dbPrevSets: snapshot.val().prevSets,
+            dbLatestMovedTile: snapshot.val().latestMovedTile,
+            dbLastUpdateTime: snapshot.val().lastUpdateTime,
+            dbLastTurnTime: snapshot.val().lastTurnTime,
+            localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
+            loading: false,
+            listening: true,
+            gameId: gameId, 
+            error: null,
+            status: status,
+          }, callback);
+        }
+        else {
+          this.setState({
+            loading: false,
+            listening: true,
+            gameId: gameId, 
+            error: null,
+            status: status,
+          });
+        }
       }
     });
   }
@@ -211,7 +223,7 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to save game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
             this.setState({ status: 'Failed to save game', error: error });
           }
@@ -251,7 +263,7 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
             this.setState({ status: 'Failed to update game', error: error });
           }
@@ -299,7 +311,7 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
             this.setState({ status: 'Failed to update game', error: error });
           }
@@ -320,7 +332,7 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Failed to updated player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to updated player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
           //if (this._isMounted) {
           //  this.setState({ status: 'Failed to join game', error: error });
           //}
@@ -330,6 +342,7 @@ class GameFormBase extends React.Component {
   /********** BUSINESS LOGIC - state update methods **********/
 
   loadComplete() {
+    if (process.env.NODE_ENV !== 'production') console.log('Load complete');
     if (this.state.dbPlayers) {
       //if (!Object.keys(this.state.dbPlayers).includes(this.props.user.authUser.uid)) {
       if (!this.state.dbPlayers[this.props.user.authUser.uid]) {
@@ -929,7 +942,7 @@ class GameFormBase extends React.Component {
       <div className='gamepage'>
         {this.state.error && <p className='error notification'>{this.state.error.message}</p>}
         {this.state.status && <p className='notification'>{this.state.status}</p>}
-        {(this.state.dbHost) ? 
+        {(!this.state.loading && this.state.dbHost) ? 
           (this.state.dbGameInProgress ? gameComponent : lobbyComponent) :
           !this.state.loading && <NotFound />}
         {(this.state.loading) && <Loading />}

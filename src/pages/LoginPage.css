@@ -3,7 +3,7 @@
   .loginpage {
     margin: auto;
     max-width: 1048px;
-    height: 200px;
+    min-height: 200px;
     text-align: center;
     padding: 0px;
   }

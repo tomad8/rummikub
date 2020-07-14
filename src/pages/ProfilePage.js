@@ -50,7 +50,7 @@ class ProfileFormBase extends React.Component {
               callback = {() => this.nameChangeComplete()}/>
           </div>
           <div>
-            <p>Login information</p>
+            <h4>Login information</h4>
           </div>
           <div className="profilefooter">
             <table><tbody>
