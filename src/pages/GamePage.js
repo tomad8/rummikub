@@ -872,7 +872,7 @@ class GameFormBase extends React.Component {
   getRackButtons() {
     const buttons = [];
     
-    if (this.state.dbRacks[this.state.localPlayer] 
+    if (this.state.dbRacks && this.state.dbRacks[this.state.localPlayer] 
         && this.state.dbRacks[this.state.localPlayer].length > 0) {
       buttons.push({
         id: 'sortByRank', 

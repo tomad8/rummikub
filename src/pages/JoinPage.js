@@ -113,15 +113,15 @@ class JoinFormBase extends React.Component {
           </div>
         </div>
         <h2>Don't have a game code?</h2>
-        <div className="note">
+        <p className="note">
           The game code is given to the host when creating a new game.
-        </div>
-        <div className="note">
+        </p>
+        <p className="note">
           If a link was shared with you then you can obtain the game code by taking the letters and numbers that follow the final / in the link.
-        </div>
-        <div className="note">
+        </p>
+        <p className="note">
           For example, if the link was {window.location.href.replace('join', 'game')}/ABC123 then you would type ABC123 in the above box and click Confirm.
-        </div>
+        </p>
         <div>
           <p><Link to={ROUTES.GAME}>Create a new game instead</Link></p>
         </div>

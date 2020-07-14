@@ -17,8 +17,8 @@ class Game extends React.Component {
       //sets: this.props.dbSets,
       localSelectedTile: null,
       localSelectedSet: null,
-      //debugMode: (process.env.NODE_ENV !== 'production'),
-      debugMode: false,
+      debugMode: (process.env.NODE_ENV !== 'production'),
+      //debugMode: false,
     };
   }
   
@@ -612,7 +612,7 @@ class Game extends React.Component {
         debugRacks.push(
           <Rack 
             key={r}  
-            player={r + ': ' + this.props.dbPlayers[uid].name}
+            player={this.props.dbPlayers[uid] && r + ': ' + this.props.dbPlayers[uid].name}
             tiles={this.getTilesRack(r)}
             debug={this.state.debugMode}
             onClick={null}
@@ -632,7 +632,8 @@ class Game extends React.Component {
     //const availableTiles = this.props.dbPlayerSequence && (TileHelper.getTotalTileCount() - (this.props.dbPlayerSequence.length - 1) * Constants.NUMBER_OF_INITIAL_RACK_TILES);
     const tilesInBag = this.props.dbTileBag && this.props.dbTileBag.length;
     
-    const playerName = this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
+    const playerName = this.props.dbPlayers && this.props.dbPlayerSequence &&
+      this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
     
     let message = '';
     let gameClassName = 'game';
@@ -670,7 +671,7 @@ class Game extends React.Component {
             onSetValidityUpdate={(invalidCount) => this.props.onSetValidityUpdate(invalidCount)}
           />
           <Rack 
-              player={null}
+              player={!this.props.dbPlayerSequence.includes(this.props.uid) && 'Spectator Mode'}
               tiles={this.getTilesRack(null)}
               debug={this.state.debugMode}
               onClick={(tileId) => this.handleClickRackTile(tileId)}
