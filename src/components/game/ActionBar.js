@@ -13,7 +13,7 @@ class ActionBar extends React.Component {
             key={i.id}
             onClick={i.onClick}
           >
-            {i.label}
+            {i.icon} <span>{i.label}</span>
           </button>
         )
       }

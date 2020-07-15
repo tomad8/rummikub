@@ -2,16 +2,46 @@
 SVG Icons - svgicons.sparkk.fr
 ----- */
 
-  .svg-icon {
+.svg-icon {
+  width: 1em;
+  height: 1em;
+}
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+  fill: var(--text-color);
+}
+.svg-icon circle {
+  stroke:var(--text-color);
+  stroke-width: 1;
+}
+
+
+.svg-icon-button {
+  width: 1em;
+  height: 1em;
+}
+.svg-icon-button path,
+.svg-icon-button polygon,
+.svg-icon-button rect {
+  fill: var(--button-text-color);
+}
+.svg-icon-button circle {
+  stroke:var(--button-text-color);
+  stroke-width: 1;
+}
+
+
+.svg-icon-emphasis {
     width: 1em;
     height: 1em;
   }
-  .svg-icon path,
-  .svg-icon polygon,
-  .svg-icon rect {
+  .svg-icon-emphasis path,
+  .svg-icon-emphasis polygon,
+  .svg-icon-emphasis rect {
     fill: var(--emphasis-color-light);
   }
-  .svg-icon circle {
+  .svg-icon-emphasis circle {
     stroke:var(--emphasis-color-light);
     stroke-width: 1;
   }

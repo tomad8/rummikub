@@ -4,6 +4,7 @@ import * as Utils from '../utils';
 import * as TileHelper from '../utils/tilehelper';
 import * as Constants from '../constants';
 import * as ROUTES from '../constants/routes';
+import * as Icons from '../icons';
 import { withRouter } from 'react-router-dom';
 import { withFirebase } from '../components/Firebase';
 import { AuthUserContext } from '../components/Session';
@@ -838,7 +839,8 @@ class GameFormBase extends React.Component {
       // host can abandon game...
       buttons.push({
         id: 'exit', 
-        label: 'Abandon Game', 
+        icon: <Icons.CrossIcon className='svg-icon-button' />,
+          label: 'Abandon Game', 
         onClick: () => this.handleClickExitGame(),
       });
     }
@@ -856,6 +858,7 @@ class GameFormBase extends React.Component {
         //if tiles placed...
         buttons.push({
           id: 'reset', 
+          icon: <Icons.CircleBackIcon className='svg-icon-button' />,
           label: 'Reset Turn', 
           onClick: () => this.handleClickResetTurn(),
         });
@@ -865,6 +868,7 @@ class GameFormBase extends React.Component {
         //if tiles placed and board is valid...
         buttons.push({
           id: 'complete', 
+          icon: <Icons.TickIcon className='svg-icon-button' />,
           label: 'Complete Turn', 
           className: 'successbutton',
           onClick: () => this.handleClickCompleteTurn(),
@@ -873,6 +877,7 @@ class GameFormBase extends React.Component {
       else {
         buttons.push({
           id: 'skip', 
+          icon: <Icons.TickIcon className='svg-icon-button' />,
           label: 'Skip Turn', 
           onClick: () => this.handleClickSkipTurn(),
         });
