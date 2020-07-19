@@ -2,8 +2,8 @@
 
   .loginpage {
     margin: auto;
-    max-width: 1032px;
-    color: white;
+    max-width: 1048px;
+    min-height: 200px;
     text-align: center;
     padding: 0px;
   }

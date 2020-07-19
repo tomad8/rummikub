@@ -6,14 +6,42 @@ SVG Icons - svgicons.sparkk.fr
     width: 1em;
     height: 1em;
   }
-  
   .svg-icon path,
   .svg-icon polygon,
   .svg-icon rect {
-    fill: #4691f6;
+    fill: var(--emphasis-color-light);
   }
-  
   .svg-icon circle {
-    stroke: #4691f6;
+    stroke:var(--emphasis-color-light);
+    stroke-width: 1;
+  }
+
+
+  .svg-icon-success {
+    width: 2em;
+    height: 2em;
+  }
+  .svg-icon-success path,
+  .svg-icon-success polygon,
+  .svg-icon-success rect {
+    fill: var(--success-color);
+  }
+  .svg-icon-success circle {
+    stroke: var(--success-color);
+    stroke-width: 1;
+  }
+
+  
+  .svg-icon-error {
+    width: 2em;
+    height: 2em;
+  }
+  .svg-icon-error path,
+  .svg-icon-error polygon,
+  .svg-icon-error rect {
+    fill: var(--error-color);
+  }
+  .svg-icon-error circle {
+    stroke: var(--error-color);
     stroke-width: 1;
   }

@@ -10,7 +10,8 @@
     /*background: rgb(53, 63, 77);*/
     font-size: 12pt;
     margin: auto;
-    max-width: 1032px;
+    max-width: 1048px;
+    height: 48px;
     padding: 1px;
     overflow: hidden;
   }
@@ -18,20 +19,23 @@
   .menulink {
     color: var(--menu-text-color);
     float: left;
-    padding: 5px;
+    padding: 10px;
+    height: 28px;
     border-radius: 3px;
   }
 
   .userlink {
     color: var(--menu-text-color);
     float: right;
-    padding: 5px;
+    padding: 10px;
+    height: 28px;
     border-radius: 3px;
   }
 
   .menulink:hover, .userlink:hover {
     color: var(--menu-text-color);
     background: var(--menu-hover-background-color);
+    cursor: pointer;
   }
   
   .menulink:active, .userlink:active {
@@ -55,7 +59,7 @@
   }
  
   .menulink i {
-    color: var(--emphasis-color);
-    font-size: 12.5pt;
+    color: var(--emphasis-color-light);
+    font-size: 13pt;
     font-family: "Times New Roman", Times, serif; 
   }

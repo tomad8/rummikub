@@ -2,7 +2,7 @@
 .app {
   text-align: center;
   /*background-color: #eee;*/
-
+  height: 100%;
 }
 
 a {
@@ -14,6 +14,14 @@ a:hover {
   color: var(--link-hover-color);
 }
 
+.textlink {
+  color: var(--link-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+.textlink:hover {
+  color: var(--link-hover-color);
+}
 
 .App-logo {
   height: 40vmin;

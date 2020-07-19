@@ -1,0 +1,75 @@
+
+
+  .lobby {
+    text-align: center;
+    padding: 0px;
+    margin: auto;
+  }
+
+  .lobbyheader {
+    margin: 10px;
+  }
+  
+  .lobbybody {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+   
+  }
+
+  .lobbylink {
+    font-size: 16pt
+  }
+
+  .lobbycode {
+    font-size: 16pt;
+    color: var(--heading-color);
+  }
+
+  .lobbyplayers, .lobbyinfo, .lobbychangename  {
+    background: var(--panel-background-color);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    text-align: left;
+    vertical-align: top;
+    margin: 10px;
+    padding: 20px;
+    flex-grow: 1;
+  }
+
+  .lobbychangename {
+    width: 100%;
+  }
+
+  .lobbyinfo {
+    font-size: 10pt;
+  }
+  
+  .lobbyplayers h3, .lobbyinfo h3, .lobbychangename h3 {
+    font-size: 12pt;
+    margin-top: 0px;
+    text-align: center;
+  }
+
+  .lobbyplayers ol, .lobbyinfo ul {
+    padding-left: 1em;
+  }
+
+  .lobbyfooter {
+    margin: 10px;
+    padding-bottom: 10px;
+  }
+
+
+
+  @media only screen and (min-width: 600px) {
+    
+    .lobbyplayers, .lobbyinfo, .lobbychangename  {
+      flex-grow: 0;
+      width: auto;
+    }
+
+  }
+  

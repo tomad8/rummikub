@@ -9,9 +9,10 @@ class ActionBar extends React.Component {
       for (const i of this.props.buttons) {
         buttons.push(
           <button
+            className={i.className ?? 'actionbutton'}
             key={i.id}
-            onClick={this.props.onClick(i.id)}
-            >
+            onClick={i.onClick}
+          >
             {i.label}
           </button>
         )

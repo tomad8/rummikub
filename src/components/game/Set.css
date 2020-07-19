@@ -1,8 +1,8 @@
 
 
   .set {
-    /*background: #f77;*/
-    border: 1px solid #999;
+    background: var(--set-background-color);
+    border: 1px solid var(--set-border-color); /*#999;*/
     border-radius: 5px;
     /*float: left;*/
     margin: 5px;
@@ -31,18 +31,18 @@
   }
   
   .set-clickable:hover {
-    border: 1px solid #777;
+    border: 1px solid var(--set-hover-color); /*#777;*/
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
   }
 
   .set-invalid {
-    border: 1px solid rgba(255, 0, 0, 1);
-    background: rgba(255, 0, 0, 0.3);
+    border: 1px solid var(--error-color);;
+    background: rgba(255, 0, 0, 0.2);
   }
 
   .set-empty {
-    border: 1px solid #eee;
-    background: #eee;
+    border: 1px solid var(--set-empty-color); /*#eee;*/
+    background: var(--set-empty-color); /*#eee;*/
     background-image: none;
   }
 

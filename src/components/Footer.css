@@ -1,0 +1,26 @@
+
+
+  .footerbg {
+    background: var(--panel-background-color);
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .footer {
+    font-size: 10pt;
+    margin: auto;
+    max-width: 1048px;
+    padding: 10px;
+    overflow: hidden;
+  }
+
+  
+  .footertextlink {
+    color: var(--link-color);
+    text-decoration: none;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+  .footertextlink:hover {
+    color: var(--link-hover-color);
+  }

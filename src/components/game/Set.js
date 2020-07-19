@@ -33,6 +33,8 @@ class Set extends React.Component {
             id={i.id !== null ? i.id : uniqueId--} 
             selected={i.selected}
             clickable={i.clickable}
+            setClickable={this.props.clickable}
+            fresh={i.fresh}
             justMoved={i.justMoved}
             debug={i.debug}
             onClick={() => this.props.onClickTile(i.id)}

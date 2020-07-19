@@ -1,0 +1,82 @@
+
+  .joinpage {
+    margin: auto;
+    max-width: 1048px;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .joinbox  {
+    display: inline-block;
+    background: var(--panel-background-color);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    text-align: left;
+    vertical-align: top;
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .joinform {
+    text-align: center;
+    padding: 0px;
+    margin: auto;
+  }
+
+  .joinform form label {
+    text-align: left;
+    padding: 0px;
+    margin: 5px;
+    font-size: 12pt;
+  }
+
+  .joinform form input {
+    text-align: left;
+    padding: 8px;
+    margin: 5px;
+    border: none;
+    border-radius: 2px;
+    font-size: 12pt;
+    width: 6em;
+  }
+
+  .joinicon {
+    vertical-align: middle;
+    animation: icon-in 0.5s ease-out;
+    transform: scale(1.0) rotate(0deg);
+  }
+
+  @keyframes icon-in {
+    0%      {transform: scale(0.5) rotate(90deg); opacity: 0.0;}
+    100%    {transform: scale(1.0) rotate(0deg); opacity: 1.0;}
+  }
+
+  .joinbutton {
+    background: var(--button-background);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 2px;
+    color: var(--button-text-color);
+    /*font-weight: bold;*/
+    margin: 5px;
+    padding: 8px;
+    font-size: 12pt;
+    cursor: pointer;
+  }
+
+  .joinbutton:hover {
+    background: var(--button-hover-background);
+  }
+  .joinbutton:active {
+    background: var(--button-active-background);
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  }
+  .joinbutton:disabled {
+    background: var(--button-disabled-background);
+    cursor: default;
+  }
+  .joinbutton:focus {
+    outline: none;
+  }
+

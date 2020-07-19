@@ -22,8 +22,16 @@ class Tile extends React.Component {
       className += ' tile-clickable'
     }
 
+    if (this.props.setClickable) {
+      className += ' tile-set-clickable'
+    }
+
     if (this.props.justMoved) {
       className += ' tile-moved'
+    }
+
+    if (this.props.fresh) {
+      className += ' tile-fresh'
     }
 
     return className;
@@ -32,6 +40,10 @@ class Tile extends React.Component {
   getTextClassName(id) {
     let className = 'tile-text';
     let colourIndex = TileHelper.getTileSuitFromId(id);
+
+    if (this.props.overrideColour) {
+      colourIndex = this.props.overrideColour - 1;
+    }
 
     // we only handle max 6 suits/colours here (should be plenty, default is 4)
     switch (colourIndex) {
@@ -48,7 +60,7 @@ class Tile extends React.Component {
   }
   
   getText(id) {    
-    return TileHelper.getTileRankFromId(id);
+    return this.props.overrideText ? this.props.overrideText : TileHelper.getTileRankFromId(id);
   }
 
   render() {

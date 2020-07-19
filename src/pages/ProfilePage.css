@@ -2,11 +2,30 @@
 
   .profilepage {
     margin: auto;
-    max-width: 1032px;
-    color: white;
+    max-width: 1048px;
     text-align: center;
     padding: 0px;
   }
 
+  .profilebox  {
+    display: inline-block;
+    background: var(--panel-background-color);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    text-align: left;
+    vertical-align: top;
+    margin: 10px;
+    padding: 15px;
+  }
 
-  
+  .profilefooter {
+    display: inline-block;
+    font-size: 9pt;
+    padding-bottom: 20px;
+  }
+
+  .profilefooter table td {
+    text-align: left;
+    padding: 3px;
+  }
