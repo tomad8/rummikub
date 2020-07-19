@@ -110,52 +110,58 @@ class GameFormBase extends React.Component {
 
   // Load initial game state, then set up an 'on' listener after load completes
   dbLoadGame(gameId, callback) {
-    this.setState({ loading: true });
+    
+    // only load if not already listening
+    if (!this.state.listening) {     
+      this.setState({ loading: true });
 
-    this.props.firebase.game(gameId)
-    .on('value', snapshot => {
-      let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
-      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
-      if (this._isMounted) {
-        if (snapshot.val()) {
-          this.setState({
-            /*db: snapshot.val(),*/
-            dbHost: snapshot.val().host,
-            dbGameInProgress: snapshot.val().gameInProgress, 
-            dbPlayers: snapshot.val().players,
-            dbPlayerSequence: snapshot.val().playerSequence,
-            dbCurrentPlayer: snapshot.val().currentPlayer,
-            dbTileBag: snapshot.val().tileBag,
-            dbRacks: snapshot.val().racks,
-            dbSets: snapshot.val().sets,
-            dbPrevRacks: snapshot.val().prevRacks,
-            dbPrevSets: snapshot.val().prevSets,
-            dbLatestMovedTiles: snapshot.val().latestMovedTiles,
-            dbLastUpdateTime: snapshot.val().lastUpdateTime,
-            dbLastTurnTime: snapshot.val().lastTurnTime,
-            localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
-            loading: false,
-            listening: true,
-            gameId: gameId, 
-            error: null,
-            status: status,
-          }, callback);
+      this.props.firebase.game(gameId)
+      .on('value', snapshot => {
+        let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
+        if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
+        if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates ON');
+        if (this._isMounted) {
+          if (snapshot.val()) {
+            this.setState({
+              /*db: snapshot.val(),*/
+              dbHost: snapshot.val().host,
+              dbGameInProgress: snapshot.val().gameInProgress, 
+              dbPlayers: snapshot.val().players,
+              dbPlayerSequence: snapshot.val().playerSequence,
+              dbCurrentPlayer: snapshot.val().currentPlayer,
+              dbTileBag: snapshot.val().tileBag,
+              dbRacks: snapshot.val().racks,
+              dbSets: snapshot.val().sets,
+              dbPrevRacks: snapshot.val().prevRacks,
+              dbPrevSets: snapshot.val().prevSets,
+              dbLatestMovedTiles: snapshot.val().latestMovedTiles,
+              dbLastUpdateTime: snapshot.val().lastUpdateTime,
+              dbLastTurnTime: snapshot.val().lastTurnTime,
+              localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
+              loading: false,
+              listening: true,
+              gameId: gameId, 
+              error: null,
+              status: status,
+            }, callback);
+          }
+          else {
+            this.setState({
+              loading: false,
+              listening: true,
+              gameId: gameId, 
+              error: null,
+              status: status,
+            });
+          }
         }
-        else {
-          this.setState({
-            loading: false,
-            listening: true,
-            gameId: gameId, 
-            error: null,
-            status: status,
-          });
-        }
-      }
-    });
+      });
+    }
   }
 
   dbStopListening() {
     if (this.state.listening) {
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates OFF');
       this.props.firebase.game(this.state.gameId).off();
       this.setState({ listening: false });
     }
