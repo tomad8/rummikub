@@ -34,6 +34,11 @@ class Board extends React.Component {
       }
     }
     
+
+    // TODO: anti-pattern - need to refactor!!
+    // Following line calls handleSetValidityUpdate method on GamePage component which calls setState.
+    // Must never set state from within render method.
+    // "Render methods should be a pure function of props and state"
     this.props.onSetValidityUpdate(invalidCount);
 
     return (

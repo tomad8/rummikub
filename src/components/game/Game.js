@@ -12,10 +12,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      //tileBag: this.props.dbTileBag,
-      //rack: this.props.dbRacks[this.props.localPlayer],
-      //sets: this.props.dbSets,
-      localSelectedTile: null,
+      localSelectedTiles: [],
       localSelectedSet: null,
       debugMode: (process.env.NODE_ENV !== 'production'),
       //debugMode: false,
@@ -23,70 +20,34 @@ class Game extends React.Component {
   }
   
   componentDidMount() {
-    this.setState({
-      localSelectedTile: null,
-      localSelectedSet: null,
-    });
   }
 
   componentWillUnmount() {
-    
   }
 
-
-  logDebug(text) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(text);
-    }
-  }
 
 
   /********** ONCLICK HANDLERS **********/
 
-
   handleClickRackTile(tileId) {    
-    if (this.state.localSelectedTile === null && tileId >=0) {
-      // no tile selected - select this one if valid
+    if (this.isTileSelected(tileId)) {
+      // clicked tile already selected - deselect it
+      this.deselectTile(tileId, null);
+    } 
+    else if (!this.isSetSelected(null) && tileId >= 0) {
+      // as long as no tiles are selected in sets, then select clicked tile in rack
       this.selectTile(tileId, null);
-    } 
-    else if (this.state.localSelectedTile === tileId) {
-      // same tile clicked - clear selection
-      this.selectTile(null, null);
-    } 
-    else if (this.state.localSelectedTile !== null && this.state.localSelectedSet === null) {
-      // another tile on rack clicked - swap them
-      this.props.onMoveTileWithinRack(this.state.localSelectedTile, tileId);
+    }
+    else if (this.isRackSelected() && tileId < 0) {
+      // if selected in rack and blank tile on rack clicked - move tiles from elsewhere on rack
+      this.props.onMoveTilesWithinRack(this.state.localSelectedTiles, tileId);
       this.clearSelection();
     } 
-    else if (this.state.localSelectedTile !== null && this.state.localSelectedSet !== null && this.isFresh(this.state.localSelectedTile)) {
-      this.props.onMoveTileFromSetToRack(this.state.localSelectedTile, this.state.localSelectedSet, tileId);
+    else if (this.isSetSelected(null) && !this.isUnfreshTileSelected()) {
+      // if selected tiles in set and they are ALL fresh - move tiles to rack 
+      this.props.onMoveTilesFromSetToRack(this.state.localSelectedTiles, this.state.localSelectedSet, tileId);
       this.clearSelection();
     }
-  }
-
-  handleClickRack() {
-    //do nothing
-    /*if (this.state.localSelectedTile === null) {
-      // no tile selected - ignore click on rack
-      return;
-    }
-    
-    if (this.state.localSelectedSet === null) {
-      // tile on rack selected - ignore click on rack
-      return;
-    }
-
-    this.logDebug('Rack clicked');
-
-    let sets = this.removeTileFromSet(this.state.localSelectedTile, this.state.localSelectedSet);
-    let racks = this.addTileToRack(this.state.localSelectedTile);
-    
-    this.setState({
-      sets: sets,
-      racks: racks,
-      localSelectedTile: null,
-      localSelectedSet: null,
-    });*/
   }
 
   handleClickSetTile(tileId, setId) {
@@ -95,21 +56,27 @@ class Game extends React.Component {
       return;
     }
     
-    if (this.state.localSelectedTile === tileId) {
-      // same tile clicked - clear selection
-      this.selectTile(null, null);
-    } 
-    else if (this.state.localSelectedSet === setId) {
-      // same set as selected - select that new tile instead
-      this.selectTile(tileId, setId);
-    } 
-    else if (this.state.localSelectedTile !== null) {
-      // different set than selected - treat as if parent Set element was clicked
-      this.handleClickSet(setId);
+    if (this.isTileSelected(tileId)) {
+      // clicked tile already selected - deselect it
+      this.deselectTile(tileId, setId);
     }
-    else if (tileId >= 0 && setId >= 0) {
-      // select tile 
-      this.selectTile(tileId, setId);
+    else if (!this.isTileSelected(null)) {
+      // no other tiles selected
+      if (tileId >= 0 && setId >= 0) {
+        // its a real tile so select it
+        this.selectTile(tileId, setId);
+      }
+    }
+    else { 
+      // some tile(s) selected
+      if (this.isSetSelected(setId)) {
+        // same set as selected tiles, add this one to selection
+        this.selectTile(tileId, setId);
+      }
+      else {
+        // different set than selected - treat as if parent Set element was clicked
+        this.handleClickSet(setId);
+      }
     }
   }
 
@@ -119,30 +86,27 @@ class Game extends React.Component {
       return;
     }
     
-    if (this.state.localSelectedTile === null) {
-      this.logDebug('Ignored click on Set ID ' + setId + ' - no tile selected');
+    if (!this.isTileSelected(null)) {
+      if (process.env.NODE_ENV !== 'production') console.log('Ignored click on Set ID ' + setId + ' - no tile selected');
       return;
     }
     
-    if (this.state.localSelectedSet === setId) {
-      this.logDebug('Ignored click on Set ID ' + setId + ' - same set as selected tile');
+    if (this.isSetSelected(setId)) {
+      if (process.env.NODE_ENV !== 'production') console.log('Ignored click on Set ID ' + setId + ' - same set as selected tiles');
       return;
     }
 
-    this.logDebug('Set ID ' + setId + ' clicked');
+    if (process.env.NODE_ENV !== 'production') console.log('Set ID ' + setId + ' clicked');
 
-    if (this.state.localSelectedSet === null) {
-      this.props.onMoveTileFromRackToSet(this.state.localSelectedTile, setId);
+    if (this.isRackSelected()) {
+      this.props.onMoveTilesFromRackToSet(this.state.localSelectedTiles, setId);
       this.clearSelection();
     } 
     else {
-      this.props.onMoveTileFromSetToSet(this.state.localSelectedTile, this.state.localSelectedSet, setId);
+      this.props.onMoveTilesFromSetToSet(this.state.localSelectedTiles, this.state.localSelectedSet, setId);
       this.clearSelection();
     }
   }
-
-
-  
 
  /*
     select scenarios:
@@ -172,48 +136,85 @@ class Game extends React.Component {
   /********** METHODS TO MOVE TILES FROM ONE LOCATION TO ANOTHER **********/
 
   selectTile(tileId, setId) {
-    if (setId !== null) {
-      this.logDebug('Selected Tile ID ' + tileId + ' in Set ID ' + setId);
-    } 
-    else {
-      if (tileId !== null) {
-        this.logDebug('Selected Tile ID ' + tileId +  ' in Rack');
+    if (!this.isTileSelected(tileId)) {
+      const tiles = this.state.localSelectedTiles.slice();
+      tiles.push(tileId);
+
+      if (setId !== null) {
+        if (process.env.NODE_ENV !== 'production') console.log('Selected Tile ID ' + tileId + ' in Set ID ' + setId);
       } 
       else {
-        this.logDebug('Selection cleared');
+        if (process.env.NODE_ENV !== 'production') console.log('Selected Tile ID ' + tileId + ' in Rack');
       }
+
+      this.setState({
+        localSelectedTiles: tiles,
+        localSelectedSet: setId,
+      });
     }
-    this.setState({
-      /*latestMovedTile: null,*/
-      localSelectedTile: tileId,
-      localSelectedSet: setId,
-    });
-    
+  }
+
+  deselectTile(tileId, setId) {
+    if (this.isTileSelected(tileId)) {
+      let set = this.state.localSelectedSet;
+      const tiles = this.state.localSelectedTiles.slice();
+      tiles.splice(tiles.indexOf(tileId), 1);
+      
+      if (setId !== null) {
+        if (process.env.NODE_ENV !== 'production') console.log('De-selected Tile ID ' + tileId + ' in Set ID ' + setId);
+
+        if (tiles.length === 0) {
+          set = null;
+          if (process.env.NODE_ENV !== 'production') console.log('No more tiles selected in Set ID ' + setId);
+        }
+      } 
+      else {
+        if (process.env.NODE_ENV !== 'production') console.log('De-selected Tile ID ' + tileId + ' in Rack');
+      }
+
+      this.setState({
+        localSelectedTiles: tiles,
+        localSelectedSet: set,
+      });
+    }
   }
 
   clearSelection() {
+    if (process.env.NODE_ENV !== 'production') console.log('Selection cleared');
     this.setState({
-      localSelectedTile: null,
+      localSelectedTiles: [],
       localSelectedSet: null,
     });
   }
 
-  /*
-  moveTileWithinRack(tileId, targetTileId) {
-    this.logDebug('Moving Tile ID ' + tileId + ' to location ' + targetTileId + ' in Rack');
-    
-    let rack = this.removeTileFromRack(tileId);
-    rack = this.addTileToRack(tileId, targetTileId, rack);
-    
-    this.setState({
-      rack: rack,
-      latestMovedTile: tileId,
-      localSelectedTile: null,
-      localSelectedSet: null,
-    });
-  } 
-*/
-  
+  isTileSelected(tileId) {
+    if (tileId === null) {
+      return this.state.localSelectedTiles
+          && this.state.localSelectedTiles.length > 0;
+    }
+    else {
+      return this.state.localSelectedTiles
+          && this.state.localSelectedTiles.includes(tileId);
+    }
+  }
+
+  isUnfreshTileSelected() {
+    return this.state.localSelectedTiles
+        && this.state.localSelectedTiles.filter(t => !this.isFresh(t)).length;
+  }
+
+  isSetSelected(setId) {
+    if (setId === null) {
+      return (this.state.localSelectedSet !== null);
+    }
+    else {
+      return (this.state.localSelectedSet === setId);
+    }
+  }
+
+  isRackSelected() {
+    return (this.isTileSelected(null) && this.state.localSelectedSet === null)
+  }
 
 
   /********** METHODS EXECUTED DURING RENDER **********/
@@ -226,7 +227,7 @@ class Game extends React.Component {
       return false;
     }
     
-    if (this.state.localSelectedTile === null) {
+    if (!this.isTileSelected(null)) {
       // no tile selected - picking up
 
       if (tileId < 0) {
@@ -248,19 +249,18 @@ class Game extends React.Component {
       // tile selected - putting down
 
       if ((rackId !== null) 
-        && (this.state.localSelectedSet === null
-            || this.isFresh(this.state.localSelectedTile))) {
-        //can put down on rack anywhere, as long as tile picked up from rack or
-        //originated from rack at start of turn (i.e. is a fresh tile)
+        && (!this.isSetSelected(null) || !this.isUnfreshTileSelected())) {
+        //can put down on rack anywhere, as long as tile(s) picked up from rack or
+        //originated from rack at start of turn (i.e. ALL are fresh tiles)
         return true;
       }
-      else if (setId !== null && tileId === null && setId !== this.state.localSelectedSet
+      else if (setId !== null && tileId === null && !this.isSetSelected(setId)
         && this.props.dbCurrentPlayer === this.props.localPlayer) {
         //set clickable, as long as not source, and it's our turn
         return true;
       }
 
-      // anything else is not a valid move;
+      // anything else is not a valid move
       return false;
     }
   }
@@ -496,7 +496,6 @@ class Game extends React.Component {
     const dbSets = this.props.dbSets ? this.props.dbSets : [];
     const sets = [];
 
-    const selectedTile = this.state.localSelectedTile;
     for (const set of dbSets) {
       //convert to class including tile id and state details
       const sortedTiles = this.sortSet(set.tiles);
@@ -506,10 +505,10 @@ class Game extends React.Component {
       for (const tileId of sortedTiles) {
         setTiles.push({
           id: tileId, 
-          selected: (tileId === selectedTile), 
+          selected: this.isTileSelected(tileId), 
           clickable: this.isClickable(tileId, set.id, null), 
           fresh: this.isFresh(tileId),
-          justMoved: (tileId === this.props.dbLatestMovedTile),
+          justMoved: (this.props.dbLatestMovedTiles && this.props.dbLatestMovedTiles.includes(tileId)),
           debug: this.state.debugMode,
         });
       }
@@ -523,37 +522,36 @@ class Game extends React.Component {
       });
     }
 
-    //if (this.state.localSelectedTile !== null) {
-      // tile selected - show a new group option
+    const setTiles = [];
+    setTiles.push({
+      id: -1, 
+      selected: false, 
+      clickable: false, 
+      justMoved: false,
+      debug: this.state.debugMode,
+    });
 
-      const setTiles = [];
-      setTiles.push({
-        id: -1, 
-        selected: false, 
-        clickable: false, 
-        justMoved: false,
-        debug: this.state.debugMode,
-      });
-
-      sets.push({
-        id: -1, 
-        tiles: setTiles, 
-        clickable: (this.props.dbCurrentPlayer === this.props.localPlayer && this.state.localSelectedTile !== null),
-        valid: true,
-        score: null,
-      });
-    //}
-
+    sets.push({
+      id: -1, 
+      tiles: setTiles, 
+      clickable: (this.props.dbCurrentPlayer === this.props.localPlayer && this.isTileSelected(null)),
+      valid: true,
+      score: null,
+    });
+    
     return sets;
   }
 
   getTilesRack(playerIndex) {
     //Assumption: player index is same as rack index
-    if (playerIndex === null) {
-      playerIndex = this.props.localPlayer;
+    let pIndex = playerIndex;
+    
+    if (pIndex === null) {
+      // null means local player
+      pIndex = this.props.localPlayer;
     }
      
-    let rack = this.props.dbRacks[playerIndex];
+    let rack = this.props.dbRacks[pIndex];
 
     if (!rack) {
       return [];
@@ -562,13 +560,14 @@ class Game extends React.Component {
     //convert to class including tile id and state details
     const rackTiles = [];
     for (let tileId of rack) {
-      const selected = (tileId === this.state.localSelectedTile);
-      const clickable = this.isClickable(tileId, null, playerIndex);
+      const selected = (playerIndex === null) && this.isTileSelected(tileId);
+      const clickable = (playerIndex === null) && this.isClickable(tileId, null, pIndex);
       rackTiles.push({
         id: tileId, 
         selected: selected, 
         clickable: clickable, 
-        justMoved: (tileId === this.props.dbLatestMovedTile || tileId === this.props.localLatestMovedTile),
+        justMoved: (this.props.dbLatestMovedTiles && this.props.dbLatestMovedTiles.includes(tileId))
+          || (this.props.localLatestMovedTiles && this.props.localLatestMovedTiles.includes(tileId)),
         debug: this.state.debugMode,
       });
     }
@@ -588,7 +587,7 @@ class Game extends React.Component {
     //convert to class including tile id and state details
     const tileBag = [];
     for (let tileId of this.props.dbTileBag) {
-      const selected = (tileId === this.state.localSelectedTile);
+      const selected = false;
       const clickable = false;
       tileBag.push({
         id: tileId, 
@@ -601,8 +600,6 @@ class Game extends React.Component {
 
     return tileBag;
   }
-
-  
 
   render() {
     const debugRacks = [];
