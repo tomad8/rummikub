@@ -1,0 +1,38 @@
+
+
+  .gamesummary {
+    background: var(--panel-background-color);
+    border: none;
+    border-radius: 3px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    text-align: left;
+    vertical-align: top;
+    margin: 5px;
+    padding: 8px; 
+    /*flex-grow: 1;*/
+    font-size: 10pt;
+    max-width: 320px;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .gamesummary-id {
+    text-align: left;
+    font-weight: bold;
+    flex-grow: 1;
+    padding-right: 5px;
+  }
+
+  .gamesummary-time {
+    text-align: right;
+    flex-grow: 1;
+  }
+
+  .gamesummary-players {
+    text-align: left;
+    
+    flex-basis: 100%;
+  }

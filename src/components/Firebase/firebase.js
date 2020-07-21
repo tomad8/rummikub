@@ -75,7 +75,12 @@ const config = {
     // *** DB - generic ref ***
     //root = () => this.db.ref();
 
-
+    // *** DB - returns constant that translates to server timestamp when saving to DB ****
+    timestampConstant = () => firebase.database.ServerValue.TIMESTAMP;
+    
+    // *** DB - returns current server timestamp ****
+    serverTimeOffset = () => this.db.ref('.info/serverTimeOffset');
+    
   }
 
   export default Firebase;

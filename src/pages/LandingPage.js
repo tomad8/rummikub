@@ -1,9 +1,11 @@
 import React from 'react';
 import './LandingPage.css';
-import {Link} from 'react-router-dom';
 import * as ROUTES from '../constants/routes';
+import { Link } from 'react-router-dom';
+import { AuthUserContext } from '../components/Session';
+import RecentGames from '../components/Landing/RecentGames';
 
-class LandingPage extends React.Component {
+class LandingPageBase extends React.Component {
   
   render() {
     
@@ -16,6 +18,7 @@ class LandingPage extends React.Component {
           <span><Link to={ROUTES.GAME}><button className="bigbutton">Create Game</button></Link></span>
           <span><Link to={ROUTES.JOIN}><button className="bigbutton">Join Game</button></Link></span>
         </div>
+        <RecentGames user = {this.props.user} />
         <div className='landingnote'>
             <h4>Getting started...</h4>
             <p className='note'>
@@ -33,5 +36,12 @@ class LandingPage extends React.Component {
   }
 }
 
+const LandingPage = props => (
+  <AuthUserContext.Consumer>
+    {user => (
+      <LandingPageBase {...props} user={user} />
+    )}
+  </AuthUserContext.Consumer>
+);
 
 export default LandingPage;

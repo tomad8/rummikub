@@ -14,16 +14,7 @@ import Loading from '../components/Loading'
 import NotFound from '../components/NotFound';
 
 
-const GamePage = () => (
-  <AuthUserContext.Consumer>
-    {user => (
-      <GameForm user={user} />
-    )}
-  </AuthUserContext.Consumer>
-);
-
-
-class GameFormBase extends React.Component {
+class GamePageBase extends React.Component {
   _isMounted = false;
     
   constructor(props) {
@@ -76,6 +67,8 @@ class GameFormBase extends React.Component {
           dbPlayers: {
             [this.props.user.authUser.uid]: {
               name: this.props.user.displayName,
+              joinTime: this.props.firebase.timestampConstant(),
+              activeTime: this.props.firebase.timestampConstant(),
               score: 0,
             },
           },
@@ -114,12 +107,12 @@ class GameFormBase extends React.Component {
     // only load if not already listening
     if (!this.state.listening) {     
       this.setState({ loading: true });
-
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates ON');
+        
       this.props.firebase.game(gameId)
       .on('value', snapshot => {
         let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
         if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
-        if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates ON');
         if (this._isMounted) {
           if (snapshot.val()) {
             this.setState({
@@ -170,15 +163,24 @@ class GameFormBase extends React.Component {
   // Save full game state
   dbSaveGame() {
     const gameId = this.state.gameId;
+
     const data = {
       host: this.state.dbHost,
       gameInProgress: this.state.dbGameInProgress,
-      players: this.state.dbPlayers,
+      /*players: this.state.dbPlayers,*/
       playerSequence: this.state.dbPlayerSequence,
       currentPlayer: this.state.dbCurrentPlayer,
-      /*lastUpdateTime: this.props.firebase.db.ServerValue.TIMESTAMP,
-      lastTurnTime: this.props.firebase.db.ServerValue.TIMESTAMP,*/
+      lastUpdateTime: this.props.firebase.timestampConstant(),
+      lastTurnTime: this.props.firebase.timestampConstant(),
     };
+    
+    const player = {
+      name: this.state.dbPlayers[this.props.user.authUser.uid].name,
+      joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,
+      activeTime: this.props.firebase.timestampConstant(), //active time is always refreshed
+      score: this.state.dbPlayers[this.props.user.authUser.uid].score,
+    };
+    data['/players/' + this.props.user.authUser.uid] = player;
     
     //these may be null, only add if they have value
     if (this.state.dbTileBag) {
@@ -195,12 +197,13 @@ class GameFormBase extends React.Component {
     if (this.state.dbLatestMovedTiles) {
       data['latestMovedTiles'] = this.state.dbLatestMovedTiles;
     }
-
+    
+    
     this.setState({ saving: true });
     
     return this.props.firebase
       .game(gameId)
-      .set(data)
+      .update(data)
       .then(
         () => {
           if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved game ' + gameId);
@@ -247,14 +250,15 @@ class GameFormBase extends React.Component {
     if (this.state.dbSets) {
       updates['/sets'] = this.state.dbSets;
     }
-    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
+    updates['/lastUpdateTime'] = this.props.firebase.timestampConstant();
+    updates['/players/' + this.props.user.authUser.uid + '/activeTime'] = this.props.firebase.timestampConstant();
     
     return this.props.firebase
       .game(gameId)
       .update(updates)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved update for game ' + gameId);
           if (this._isMounted) {
             this.setState({ 
               saving: false,
@@ -264,9 +268,9 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save update for game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
-            this.setState({ status: 'Failed to update game', error: error });
+            this.setState({ status: 'Failed to save update for game', error: error });
           }
         });
   }
@@ -292,15 +296,16 @@ class GameFormBase extends React.Component {
       updates['/sets'] = this.state.dbSets;
       updates['/prevSets'] = this.state.dbSets;
     }
-    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;
-    updates['/lastTurnTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
-
+    updates['/lastUpdateTime'] = this.props.firebase.timestampConstant();
+    updates['/lastTurnTime'] = this.props.firebase.timestampConstant();
+    updates['/players/' + this.props.user.authUser.uid + '/activeTime'] = this.props.firebase.timestampConstant();
+    
     return this.props.firebase
       .game(gameId)
       .update(updates)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved next turn update for game ' + gameId);
           if (this._isMounted) {
             this.setState({ 
               saving: false,
@@ -312,9 +317,9 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save next turn update for game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
-            this.setState({ status: 'Failed to update game', error: error });
+            this.setState({ status: 'Failed to save next turn update for game', error: error });
           }
         });
   }
@@ -326,14 +331,14 @@ class GameFormBase extends React.Component {
       .update(data)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated player ' + playerId + ' in game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved player ' + playerId + ' in game ' + gameId);
           //if (this._isMounted) {
           //  this.setState({ status: 'Joined game', error: null,});
           //}
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to updated player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
           //if (this._isMounted) {
           //  this.setState({ status: 'Failed to join game', error: error });
           //}
@@ -368,6 +373,8 @@ class GameFormBase extends React.Component {
     
     let newPlayer = {
       name: this.props.user.displayName,
+      joinTime: this.props.firebase.timestampConstant(),
+      activeTime: this.props.firebase.timestampConstant(),
       score: 0,
     };
 
@@ -967,12 +974,19 @@ class GameFormBase extends React.Component {
           (this.state.dbGameInProgress ? gameComponent : lobbyComponent) :
           !this.state.loading && <NotFound />}
         {(this.state.loading) && <Loading />}
-        {(this.state.saving) && <Loading inTitle={true} />}
+        {(this.state.saving) && <Loading className="title" />}
       </div>
     );
   }
 }
 
-const GameForm = withRouter(withFirebase(GameFormBase));
+const GamePage = props => (
+  <AuthUserContext.Consumer>
+    {user => (
+      <GamePageBase {...props} user={user} />
+    )}
+  </AuthUserContext.Consumer>
+);
 
-export default GamePage;
+export default withRouter(withFirebase(GamePage));
+

@@ -7,13 +7,8 @@ import { withRouter, Link} from 'react-router-dom';
 import { withFirebase } from '../components/Firebase';
 import Loading from '../components/Loading';
 
-const JoinPage = () => (
-  <div className='joinpage'>
-    <JoinForm />
-  </div>
-);
 
-class JoinFormBase extends React.Component {
+class JoinPageBase extends React.Component {
   _isMounted = false;
     
   constructor(props) {
@@ -107,7 +102,7 @@ class JoinFormBase extends React.Component {
                   Confirm
               </button>
             </form> 
-            {loading && <Loading inLine={true}/>}
+            {loading && <Loading className="inline" />}
             {success && <p className="success">{success}</p>}
             {error && <p className="error">{error}</p>}
           </div>
@@ -130,6 +125,10 @@ class JoinFormBase extends React.Component {
   }
 }
 
-const JoinForm = withRouter(withFirebase(JoinFormBase));
- 
-export default JoinPage;
+const JoinPage = props => (
+  <div className='joinpage'>
+    <JoinPageBase {...props}/>
+  </div>
+);
+
+export default withRouter(withFirebase(JoinPage));

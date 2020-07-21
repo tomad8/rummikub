@@ -61,7 +61,7 @@ class Lobby extends React.Component {
             </div> :
             <div>
               <p>Waiting for host to start game...</p>
-              <Loading inLine={true} />
+              <Loading className="inline" />
             </div>
           }
         </div>

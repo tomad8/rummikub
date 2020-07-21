@@ -27,4 +27,45 @@ export function getID(numberOfCharacters) {
     return id;
 }
   
+
+export function getSmartAgeFromMs(timeMs, shortUnits) {
+    /*let time = new Date(timeMs);
+    let days = time.getUTCDays();
+    let hours = time.getUTCHours();
+    let minutes = time.getUTCMinutes();
+    let seconds = time.getUTCSeconds();
+    let milliseconds = time.getUTCMilliseconds();*/
+    
+    if (!timeMs) {
+        return (shortUnits ? 'n/a' : ' n/a');
+    }
+
+    if (timeMs < 0) {
+        timeMs = -timeMs;
+    }
+    let suffix = ' ago';
+    
+    let days = Math.round(timeMs / 1000 / 60 / 60 / 24);
+    if (days >= 1) {
+        return days + (shortUnits ? 'd' : ' day' + (days > 1 ? 's' : '') + suffix);
+    } 
+    
+    let hours = Math.round(timeMs / 1000 / 60 / 60);
+    if (hours >= 1) {
+        return hours + (shortUnits ? 'h' : ' hour' + (hours > 1 ? 's' : '') + suffix);
+    }
+    
+    let minutes = Math.round(timeMs / 1000 / 60);
+    if (minutes >= 1) {
+        return minutes + (shortUnits ? 'm' : ' minute' + (minutes > 1 ? 's' : '') + suffix);
+    }
+    
+    let seconds = Math.round(timeMs / 1000);
+    if (seconds >= 5) {
+        return seconds + (shortUnits ? 's' : ' second' + (seconds > 1 ? 's' : '') + suffix);
+    }
+    
+    return (shortUnits ? 'now' : ' just a moment' + suffix);
+}
+  
   
