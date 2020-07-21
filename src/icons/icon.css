@@ -39,10 +39,10 @@ SVG Icons - svgicons.sparkk.fr
   .svg-icon-emphasis path,
   .svg-icon-emphasis polygon,
   .svg-icon-emphasis rect {
-    fill: var(--emphasis-color-light);
+    fill: var(--emphasis-color-titlebar);
   }
   .svg-icon-emphasis circle {
-    stroke:var(--emphasis-color-light);
+    stroke:var(--emphasis-color-titlebar);
     stroke-width: 1;
   }
 

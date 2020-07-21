@@ -17,7 +17,7 @@
 
   .actionbutton {
     background: var(--button-background);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--button-box-shadow);
     border: none;
     border-radius: 3px;
     /*font-size: 14px;*/
@@ -44,7 +44,7 @@
 
   .successbutton {
     background: var(--green-button-background);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--button-box-shadow);
     border: none;
     border-radius: 3px;
     /*font-size: 14px;*/

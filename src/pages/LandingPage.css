@@ -5,20 +5,20 @@
   max-width: 1048px;
   text-align: center;
   min-height: 200px;
-  padding: 0px;
+  padding: 0px 10px;
 }
 
 .landingtitle {
   color: var(--title-color);
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-  font-size: 30pt;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 34pt;
   font-weight: normal;
   text-align: center;
   padding: 0px;
 }
 .landingtitle i {
   color: var(--emphasis-color-dark);
-  font-size: 31pt;
+  font-size: 36pt;
   font-family: "Times New Roman", Times, serif; 
 }
 
@@ -33,7 +33,7 @@
 
 .bigbutton {
   background: var(--button-background);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--button-box-shadow);
   border: none;
   border-radius: 3px;
   width: 250px;
@@ -53,7 +53,7 @@
 
 .bigbutton:active {
   background: var(--button-active-background);
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--button-box-shadow);
 }
 .bigbutton:focus {
   outline: none;
@@ -63,6 +63,6 @@
   text-align: center;
   color: var(--note-color);
   padding: 5px;
-  margin-left: 15%;
-  margin-right: 15%;
+  /*margin-left: 15%;
+  margin-right: 15%;*/
 }

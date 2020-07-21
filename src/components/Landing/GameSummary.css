@@ -4,7 +4,7 @@
     background: var(--panel-background-color);
     border: none;
     border-radius: 3px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--panel-box-shadow);
     text-align: left;
     vertical-align: top;
     margin: 5px;

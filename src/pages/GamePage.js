@@ -74,7 +74,7 @@ class GamePageBase extends React.Component {
           },
         },
           () => {
-            return this.dbSaveGame();
+            return this.dbSaveGame(true);
           }
         );
         
@@ -161,7 +161,7 @@ class GamePageBase extends React.Component {
   }
 
   // Save full game state
-  dbSaveGame() {
+  dbSaveGame(savePlayers) {
     const gameId = this.state.gameId;
 
     const data = {
@@ -174,14 +174,22 @@ class GamePageBase extends React.Component {
       lastTurnTime: this.props.firebase.timestampConstant(),
     };
     
-    const player = {
-      name: this.state.dbPlayers[this.props.user.authUser.uid].name,
-      joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,
-      activeTime: this.props.firebase.timestampConstant(), //active time is always refreshed
-      score: this.state.dbPlayers[this.props.user.authUser.uid].score,
-    };
-    data['/players/' + this.props.user.authUser.uid] = player;
+    // only save full players list on first creation of game by host
+    if (savePlayers) {
+      data['players'] = this.state.dbPlayers;
+    }
+    else {
+      const player = {
+        name: this.state.dbPlayers[this.props.user.authUser.uid].name,
+        joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,
+        activeTime: this.props.firebase.timestampConstant(), //active time is always refreshed
+        score: this.state.dbPlayers[this.props.user.authUser.uid].score,
+      };
+      data['/players/' + this.props.user.authUser.uid] = player;
+    }
+
     
+
     //these may be null, only add if they have value
     if (this.state.dbTileBag) {
       data['tileBag'] = this.state.dbTileBag;
@@ -456,7 +464,7 @@ class GamePageBase extends React.Component {
       localLatestMovedTiles: [],
       }, 
       () => {
-        return this.dbSaveGame();
+        return this.dbSaveGame(true);
       }
     );
   }
@@ -467,7 +475,7 @@ class GamePageBase extends React.Component {
       dbGameInProgress: false,
     }, 
       () => {
-        return this.dbSaveGame();
+        return this.dbSaveGame(false);
       }
     );
   }
@@ -509,8 +517,13 @@ class GamePageBase extends React.Component {
     let sets = this.state.dbSets;
     const setTilesMoved = JSON.stringify(this.state.dbSets) !== JSON.stringify(this.state.dbPrevSets);
     if (setTilesMoved) {
-      if (this.state.dbPrevSets) {
+      if (process.env.NODE_ENV !== 'production') console.log('setTilesMoved is true');
+      if (this.state.dbPrevSets && this.state.dbPrevSets.length > 0) {
         sets = this.state.dbPrevSets.slice();
+        if (process.env.NODE_ENV !== 'production') console.log('sets = this.state.dbPrevSets.slice();');
+      }
+      else {
+        sets = [];
       }
       racks[this.state.localPlayer] = this.state.dbPrevRacks[this.state.localPlayer].slice();
     
@@ -574,8 +587,8 @@ class GamePageBase extends React.Component {
     this.setState({
       dbSets: sets,
       dbRacks: racks,
-      dbLatestMovedTiles: tiles,
-      localLatestMovedTiles: [],
+      dbLatestMovedTiles: [],
+      localLatestMovedTiles: tiles,
     },
       this.dbSaveGameUpdate
     );
@@ -943,6 +956,7 @@ class GamePageBase extends React.Component {
         dbSets = {this.state.dbSets}
         dbCurrentPlayer = {this.state.dbCurrentPlayer}
         dbLatestMovedTiles = {this.state.dbLatestMovedTiles}
+        gameId = {this.state.gameId}  
         uid = {this.props.user.authUser && this.props.user.authUser.uid}
         localPlayer = {this.state.localPlayer}
         localLatestMovedTiles = {this.state.localLatestMovedTiles}

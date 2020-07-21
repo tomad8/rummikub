@@ -11,7 +11,7 @@
     background: var(--panel-background-color);
     border: none;
     border-radius: 3px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--panel-box-shadow);
     text-align: left;
     vertical-align: top;
     margin: 10px;
@@ -54,7 +54,7 @@
 
   .joinbutton {
     background: var(--button-background);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--button-box-shadow);
     border: none;
     border-radius: 2px;
     color: var(--button-text-color);
@@ -70,7 +70,7 @@
   }
   .joinbutton:active {
     background: var(--button-active-background);
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--button-box-shadow);
   }
   .joinbutton:disabled {
     background: var(--button-disabled-background);

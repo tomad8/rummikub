@@ -14,21 +14,45 @@ class RecentGames extends React.Component {
     this.state = { 
       recentGames: [],
       loading: false,
-      error: null, };
+      error: null,
+      serverTimeOffsetMs: null,
+      estimatedServerTimeMs: null,
+    };
   }
 
   componentDidMount() {
     this._isMounted = true;
+    this._timer = null;
 
     if (process.env.NODE_ENV !== 'production') console.log('this.props.user = ' + this.props.user);
       
     if (this.props.user && this.props.user.authUser && this.props.user.authUser.uid) {
       this.dbLoadRecentGames(this.props.user.authUser.uid);
     }
+
+    // 1 second timer to refresh game times
+    this._timer = setInterval(() => {
+      if (this._isMounted && this.state.serverTimeOffsetMs !== null) {
+        this.setState({
+          estimatedServerTimeMs: new Date().getTime() + this.state.serverTimeOffsetMs,
+        })
+      }
+    }, 1000);
+
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+
+    if (this.props.user && this.props.user.authUser && this.props.user.authUser.uid) {
+      this.dbStopListening(this.props.user.authUser.uid);
+    }
+    
+    clearInterval(this._timer);
+  }
+
+  dbStopListening(userId) {
+    this.props.firebase.games().orderByChild("players/" + userId + "/activeTime").off();
   }
 
   dbLoadRecentGames(userId) {
@@ -76,6 +100,7 @@ class RecentGames extends React.Component {
           this.setState({
             recentGames: games.reverse(),
             error: error,
+            serverTimeOffsetMs: offset,
             estimatedServerTimeMs: serverTime,
             loading: false,
           })
@@ -106,7 +131,7 @@ class RecentGames extends React.Component {
 
     return (
       <div>
-        {games.length > 0 && <h4>Recent games</h4>}
+        {games.length > 0 && <h3>Recent games</h3>}
         {games.length > 0 && <div className="recentgames">{games}</div>}
         {/*!this.state.loading && games.length === 0 && <p>No recent games found</p>*/}
         {this.state.loading && <Loading className="inline-small"/>}

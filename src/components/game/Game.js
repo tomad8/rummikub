@@ -679,7 +679,8 @@ class Game extends React.Component {
             />
         </div>
         <div className='gamenote'>
-          {Constants.NUMBER_OF_TILE_DECKS} decks
+          Game {this.props.gameId + ' '}
+          • {Constants.NUMBER_OF_TILE_DECKS} decks
           • {Constants.NUMBER_OF_TILE_SUITS} colours (suits)
           • {Constants.NUMBER_OF_TILE_RANKS} numbers (ranks)
           • {Constants.NUMBER_OF_TILE_JOKERS} jokers

@@ -63,7 +63,7 @@
   }
  
   .menulink i {
-    color: var(--emphasis-color-light);
-    font-size: 13pt;
+    color: var(--emphasis-color-titlebar);
+    font-size: 12.5pt;
     font-family: "Times New Roman", Times, serif; 
   }
