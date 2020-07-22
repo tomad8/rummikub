@@ -79,7 +79,8 @@ class RecentGames extends React.Component {
         const games = [];
         if (snapshot.numChildren() > 0) {
           snapshot.forEach( gameSnapshot => {
-            if (serverTime - gameSnapshot.val().lastTurnTime < MAX_AGE_OF_RECENT_GAMES_MS ) {
+            if (gameSnapshot.val().players && gameSnapshot.val().players[userId]
+                && serverTime - gameSnapshot.val().players[userId].activeTime < MAX_AGE_OF_RECENT_GAMES_MS ) {
               games.push({
                 gameId: gameSnapshot.key,
                 host: gameSnapshot.val().host,
