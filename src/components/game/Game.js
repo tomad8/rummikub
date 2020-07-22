@@ -2,6 +2,7 @@ import React from 'react';
 import './Game.css';
 import * as Constants from '../../constants';
 import * as TileHelper from '../../utils/tilehelper';
+import * as Utils from '../../utils';
 import Board from './Board';
 import Rack from './Rack';
 import ActionBar from './ActionBar';
@@ -645,6 +646,8 @@ class Game extends React.Component {
       message = <div className='gamemessage'>{"Waiting for " + playerName + " to take their turn..."}</div>;
     }
 
+    let timer = Utils.getSmartAgeFromMs(this.props.estimatedServerTimeMs - this.props.dbLastTurnTime);
+
     return (
       <div className={gameClassName}>
         <div className="gameheader">
@@ -656,6 +659,9 @@ class Game extends React.Component {
             uid={this.props.uid}
             tileCounts={this.getTileCounts()} 
           />
+          <div className="gametimer">
+            {timer}
+            </div>
           <div className="message-and-actionbar">
             {message}
             <ActionBar

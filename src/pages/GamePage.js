@@ -39,6 +39,8 @@ class GamePageBase extends React.Component {
       dbLastUpdateTime: null,
       dbLastTurnTime: null,
       localLatestMovedTiles: [],
+      estimatedServerTimeMs: null,
+      serverTimeOffsetMs: null,
     };
   }
   
@@ -90,12 +92,23 @@ class GamePageBase extends React.Component {
         this.dbLoadGame(gameId, this.loadComplete);
       }
     }
+
+    // 1 second timer to refresh game times
+    this._timer = setInterval(() => {
+      if (this._isMounted && this.state.serverTimeOffsetMs !== null) {
+        this.setState({
+          estimatedServerTimeMs: new Date().getTime() + this.state.serverTimeOffsetMs,
+        })
+      }
+    }, 1000);
   }
 
   componentWillUnmount() {
     this._isMounted = false;
 
     this.dbStopListening();
+
+    clearInterval(this._timer);
   }
 
 
@@ -356,24 +369,42 @@ class GamePageBase extends React.Component {
   /********** BUSINESS LOGIC - state update methods **********/
 
   loadComplete() {
-    if (process.env.NODE_ENV !== 'production') console.log('Load complete');
-    if (this.state.dbPlayers) {
-      //if (!Object.keys(this.state.dbPlayers).includes(this.props.user.authUser.uid)) {
-      if (!this.state.dbPlayers[this.props.user.authUser.uid]) {
-        this.addUserToGame();
+    if (process.env.NODE_ENV !== 'production') console.log('Load complete, fetching server offset...');
+    this.props.firebase.serverTimeOffset()
+    .once("value", snapshotOffset => {
+      let offset = snapshotOffset.val();
+      let serverTime = new Date().getTime() + offset;
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Server offset is ' + offset + ' ms');
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Est server time is ' + serverTime + ' ms');
+      
+      if (this._isMounted) {
+        this.setState({
+          serverTimeOffsetMs: offset,
+          estimatedServerTimeMs: serverTime,
+          /*loading: false,*/
+        })
       }
-      else {
-        if (process.env.NODE_ENV !== 'production') console.log('User ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName  + ' is already a player in this game');
-        
-        if (this.state.gameInProgress && this.state.localPlayer === this.state.dbCurrentPlayer) {
-          this.dbStopListening(); //because its our turn - we're gonna be pushing all the updates!
-        }
 
-        if (this.state.dbPlayers[this.props.user.authUser.uid].name !== this.props.user.displayName) {
-          this.updateGamePlayerName();
+      if (this.state.dbPlayers) {
+        //if (!Object.keys(this.state.dbPlayers).includes(this.props.user.authUser.uid)) {
+        if (!this.state.dbPlayers[this.props.user.authUser.uid]) {
+          this.addUserToGame();
+        }
+        else {
+          if (process.env.NODE_ENV !== 'production') console.log('User ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName  + ' is already a player in this game');
+          
+          /*
+          if (this.state.gameInProgress && this.state.localPlayer === this.state.dbCurrentPlayer) {
+            this.dbStopListening(); //because its our turn - we're gonna be pushing all the updates!
+          }
+          */
+
+          if (this.state.dbPlayers[this.props.user.authUser.uid].name !== this.props.user.displayName) {
+            this.updateGamePlayerName();
+          }
         }
       }
-    }
+    });
   }
 
   addUserToGame() {
@@ -956,6 +987,8 @@ class GamePageBase extends React.Component {
         dbSets = {this.state.dbSets}
         dbCurrentPlayer = {this.state.dbCurrentPlayer}
         dbLatestMovedTiles = {this.state.dbLatestMovedTiles}
+        dbLastTurnTime = {this.state.dbLastTurnTime}
+        estimatedServerTimeMs = {this.state.estimatedServerTimeMs}
         gameId = {this.state.gameId}  
         uid = {this.props.user.authUser && this.props.user.authUser.uid}
         localPlayer = {this.state.localPlayer}

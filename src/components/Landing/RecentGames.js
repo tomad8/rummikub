@@ -105,7 +105,7 @@ class RecentGames extends React.Component {
             loading: false,
           })
         }
-      })
+      });
     });
     /*.then(
       
