@@ -4,6 +4,7 @@ import * as Utils from '../utils';
 import * as TileHelper from '../utils/tilehelper';
 import * as Constants from '../constants';
 import * as ROUTES from '../constants/routes';
+import * as Icons from '../icons';
 import { withRouter } from 'react-router-dom';
 import { withFirebase } from '../components/Firebase';
 import { AuthUserContext } from '../components/Session';
@@ -13,16 +14,7 @@ import Loading from '../components/Loading'
 import NotFound from '../components/NotFound';
 
 
-const GamePage = () => (
-  <AuthUserContext.Consumer>
-    {user => (
-      <GameForm user={user} />
-    )}
-  </AuthUserContext.Consumer>
-);
-
-
-class GameFormBase extends React.Component {
+class GamePageBase extends React.Component {
   _isMounted = false;
     
   constructor(props) {
@@ -43,10 +35,12 @@ class GameFormBase extends React.Component {
       dbTileBag: [],
       dbRacks: [],
       dbSets: [],
-      dbLatestMovedTile: null,
+      dbLatestMovedTiles: [],
       dbLastUpdateTime: null,
       dbLastTurnTime: null,
-      localLatestMovedTile: null,
+      localLatestMovedTiles: [],
+      estimatedServerTimeMs: null,
+      serverTimeOffsetMs: null,
     };
   }
   
@@ -75,12 +69,14 @@ class GameFormBase extends React.Component {
           dbPlayers: {
             [this.props.user.authUser.uid]: {
               name: this.props.user.displayName,
+              joinTime: this.props.firebase.timestampConstant(),
+              activeTime: this.props.firebase.timestampConstant(),
               score: 0,
             },
           },
         },
           () => {
-            return this.dbSaveGame();
+            return this.dbSaveGame(true);
           }
         );
         
@@ -96,89 +92,117 @@ class GameFormBase extends React.Component {
         this.dbLoadGame(gameId, this.loadComplete);
       }
     }
+
+    // 1 second timer to refresh game times
+    this._timer = setInterval(() => {
+      if (this._isMounted && this.state.serverTimeOffsetMs !== null) {
+        this.setState({
+          estimatedServerTimeMs: new Date().getTime() + this.state.serverTimeOffsetMs,
+        })
+      }
+    }, 1000);
   }
 
   componentWillUnmount() {
     this._isMounted = false;
 
     this.dbStopListening();
+
+    clearInterval(this._timer);
   }
 
-
-  logDebug(text) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(text);
-    }
-  }
 
   /********** DATABASE ACCESS METHODS **********/
 
   // Load initial game state, then set up an 'on' listener after load completes
   dbLoadGame(gameId, callback) {
-    this.setState({ loading: true });
-
-    this.props.firebase.game(gameId)
-    .on('value', snapshot => {
-      let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
-      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
-      if (this._isMounted) {
-        if (snapshot.val()) {
-          this.setState({
-            /*db: snapshot.val(),*/
-            dbHost: snapshot.val().host,
-            dbGameInProgress: snapshot.val().gameInProgress, 
-            dbPlayers: snapshot.val().players,
-            dbPlayerSequence: snapshot.val().playerSequence,
-            dbCurrentPlayer: snapshot.val().currentPlayer,
-            dbTileBag: snapshot.val().tileBag,
-            dbRacks: snapshot.val().racks,
-            dbSets: snapshot.val().sets,
-            dbPrevRacks: snapshot.val().prevRacks,
-            dbPrevSets: snapshot.val().prevSets,
-            dbLatestMovedTile: snapshot.val().latestMovedTile,
-            dbLastUpdateTime: snapshot.val().lastUpdateTime,
-            dbLastTurnTime: snapshot.val().lastTurnTime,
-            localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
-            loading: false,
-            listening: true,
-            gameId: gameId, 
-            error: null,
-            status: status,
-          }, callback);
+    
+    // only load if not already listening
+    if (!this.state.listening) {     
+      this.setState({ loading: true });
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates ON');
+        
+      this.props.firebase.game(gameId)
+      .on('value', snapshot => {
+        let status = (snapshot.val() ? 'Game ' + gameId + ' loaded' : 'Game ' + gameId + ' not found')
+        if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: load game: ' + status);
+        if (this._isMounted) {
+          if (snapshot.val()) {
+            this.setState({
+              /*db: snapshot.val(),*/
+              dbHost: snapshot.val().host,
+              dbGameInProgress: snapshot.val().gameInProgress, 
+              dbPlayers: snapshot.val().players,
+              dbPlayerSequence: snapshot.val().playerSequence,
+              dbCurrentPlayer: snapshot.val().currentPlayer,
+              dbTileBag: snapshot.val().tileBag,
+              dbRacks: snapshot.val().racks,
+              dbSets: snapshot.val().sets,
+              dbPrevRacks: snapshot.val().prevRacks,
+              dbPrevSets: snapshot.val().prevSets,
+              dbLatestMovedTiles: snapshot.val().latestMovedTiles,
+              dbLastUpdateTime: snapshot.val().lastUpdateTime,
+              dbLastTurnTime: snapshot.val().lastTurnTime,
+              localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
+              loading: false,
+              listening: true,
+              gameId: gameId, 
+              error: null,
+              status: status,
+            }, callback);
+          }
+          else {
+            this.setState({
+              loading: false,
+              listening: true,
+              gameId: gameId, 
+              error: null,
+              status: status,
+            });
+          }
         }
-        else {
-          this.setState({
-            loading: false,
-            listening: true,
-            gameId: gameId, 
-            error: null,
-            status: status,
-          });
-        }
-      }
-    });
+      });
+    }
   }
 
   dbStopListening() {
     if (this.state.listening) {
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Listening for updates OFF');
       this.props.firebase.game(this.state.gameId).off();
       this.setState({ listening: false });
     }
   }
 
   // Save full game state
-  dbSaveGame() {
+  dbSaveGame(savePlayers) {
     const gameId = this.state.gameId;
+
     const data = {
       host: this.state.dbHost,
       gameInProgress: this.state.dbGameInProgress,
-      players: this.state.dbPlayers,
+      /*players: this.state.dbPlayers,*/
       playerSequence: this.state.dbPlayerSequence,
       currentPlayer: this.state.dbCurrentPlayer,
-      /*lastUpdateTime: this.props.firebase.db.ServerValue.TIMESTAMP,
-      lastTurnTime: this.props.firebase.db.ServerValue.TIMESTAMP,*/
+      lastUpdateTime: this.props.firebase.timestampConstant(),
+      lastTurnTime: this.props.firebase.timestampConstant(),
     };
     
+    // only save full players list on first creation of game by host
+    if (savePlayers) {
+      data['players'] = this.state.dbPlayers;
+    }
+    else {
+      const player = {
+        name: this.state.dbPlayers[this.props.user.authUser.uid].name,
+        joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,
+        activeTime: this.props.firebase.timestampConstant(), //active time is always refreshed
+        score: this.state.dbPlayers[this.props.user.authUser.uid].score,
+      };
+      data['/players/' + this.props.user.authUser.uid] = player;
+    }
+
+    
+
     //these may be null, only add if they have value
     if (this.state.dbTileBag) {
       data['tileBag'] = this.state.dbTileBag;
@@ -191,15 +215,16 @@ class GameFormBase extends React.Component {
       data['sets'] = this.state.dbSets;
       data['prevSets'] = this.state.dbSets;
     }
-    if (this.state.dbLatestMovedTile) {
-      data['latestMovedTile'] = this.state.dbLatestMovedTile;
+    if (this.state.dbLatestMovedTiles) {
+      data['latestMovedTiles'] = this.state.dbLatestMovedTiles;
     }
-
+    
+    
     this.setState({ saving: true });
     
     return this.props.firebase
       .game(gameId)
-      .set(data)
+      .update(data)
       .then(
         () => {
           if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved game ' + gameId);
@@ -237,8 +262,8 @@ class GameFormBase extends React.Component {
     const gameId = this.state.gameId;
     
     const updates = {};
-    if (this.state.dbLatestMovedTile) {
-      updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
+    if (this.state.dbLatestMovedTiles) {
+      updates['/latestMovedTiles'] = this.state.dbLatestMovedTiles;
     }
     if (this.state.dbRacks[this.state.localPlayer]) {
       updates['/racks/' + this.state.localPlayer] = this.state.dbRacks[this.state.localPlayer];
@@ -246,14 +271,15 @@ class GameFormBase extends React.Component {
     if (this.state.dbSets) {
       updates['/sets'] = this.state.dbSets;
     }
-    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
+    updates['/lastUpdateTime'] = this.props.firebase.timestampConstant();
+    updates['/players/' + this.props.user.authUser.uid + '/activeTime'] = this.props.firebase.timestampConstant();
     
     return this.props.firebase
       .game(gameId)
       .update(updates)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved update for game ' + gameId);
           if (this._isMounted) {
             this.setState({ 
               saving: false,
@@ -263,9 +289,9 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save update for game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
-            this.setState({ status: 'Failed to update game', error: error });
+            this.setState({ status: 'Failed to save update for game', error: error });
           }
         });
   }
@@ -277,8 +303,8 @@ class GameFormBase extends React.Component {
     
     const updates = {};
     updates['/currentPlayer'] = this.state.dbCurrentPlayer;
-    if (this.state.dbLatestMovedTile) {
-      updates['/latestMovedTile'] = this.state.dbLatestMovedTile;
+    if (this.state.dbLatestMovedTiles) {
+      updates['/latestMovedTiles'] = this.state.dbLatestMovedTiles;
     }
     if (this.state.dbTileBag) {
       updates['/tileBag'] = this.state.dbTileBag;
@@ -291,15 +317,16 @@ class GameFormBase extends React.Component {
       updates['/sets'] = this.state.dbSets;
       updates['/prevSets'] = this.state.dbSets;
     }
-    /*updates['/lastUpdateTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;
-    updates['/lastTurnTime'] = this.props.firebase.db.ServerValue.TIMESTAMP;*/
-
+    updates['/lastUpdateTime'] = this.props.firebase.timestampConstant();
+    updates['/lastTurnTime'] = this.props.firebase.timestampConstant();
+    updates['/players/' + this.props.user.authUser.uid + '/activeTime'] = this.props.firebase.timestampConstant();
+    
     return this.props.firebase
       .game(gameId)
       .update(updates)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved next turn update for game ' + gameId);
           if (this._isMounted) {
             this.setState({ 
               saving: false,
@@ -311,9 +338,9 @@ class GameFormBase extends React.Component {
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to update game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save next turn update for game ' + gameId + ': ' + error.code + ' - ' + error.message);
           if (this._isMounted) {
-            this.setState({ status: 'Failed to update game', error: error });
+            this.setState({ status: 'Failed to save next turn update for game', error: error });
           }
         });
   }
@@ -325,14 +352,14 @@ class GameFormBase extends React.Component {
       .update(data)
       .then(
         () => {
-          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully updated player ' + playerId + ' in game ' + gameId);
+          if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Sucessfully saved player ' + playerId + ' in game ' + gameId);
           //if (this._isMounted) {
           //  this.setState({ status: 'Joined game', error: null,});
           //}
         })
       .catch(
         error => {
-          console.error('Firebase DB: Failed to updated player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
+          console.error('Firebase DB: Failed to save player ' + playerId + ' in game ' + gameId + ': ' + error.code + ' - ' + error.message);
           //if (this._isMounted) {
           //  this.setState({ status: 'Failed to join game', error: error });
           //}
@@ -342,24 +369,42 @@ class GameFormBase extends React.Component {
   /********** BUSINESS LOGIC - state update methods **********/
 
   loadComplete() {
-    if (process.env.NODE_ENV !== 'production') console.log('Load complete');
-    if (this.state.dbPlayers) {
-      //if (!Object.keys(this.state.dbPlayers).includes(this.props.user.authUser.uid)) {
-      if (!this.state.dbPlayers[this.props.user.authUser.uid]) {
-        this.addUserToGame();
+    if (process.env.NODE_ENV !== 'production') console.log('Load complete, fetching server offset...');
+    this.props.firebase.serverTimeOffset()
+    .once("value", snapshotOffset => {
+      let offset = snapshotOffset.val();
+      let serverTime = new Date().getTime() + offset;
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Server offset is ' + offset + ' ms');
+      if (process.env.NODE_ENV !== 'production') console.log('Firebase DB: Est server time is ' + serverTime + ' ms');
+      
+      if (this._isMounted) {
+        this.setState({
+          serverTimeOffsetMs: offset,
+          estimatedServerTimeMs: serverTime,
+          /*loading: false,*/
+        })
       }
-      else {
-        if (process.env.NODE_ENV !== 'production') console.log('User ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName  + ' is already a player in this game');
-        
-        if (this.state.gameInProgress && this.state.localPlayer === this.state.dbCurrentPlayer) {
-          this.dbStopListening(); //because its our turn - we're gonna be pushing all the updates!
-        }
 
-        if (this.state.dbPlayers[this.props.user.authUser.uid].name !== this.props.user.displayName) {
-          this.updateGamePlayerName();
+      if (this.state.dbPlayers) {
+        //if (!Object.keys(this.state.dbPlayers).includes(this.props.user.authUser.uid)) {
+        if (!this.state.dbPlayers[this.props.user.authUser.uid]) {
+          this.addUserToGame();
+        }
+        else {
+          if (process.env.NODE_ENV !== 'production') console.log('User ' + this.props.user.authUser.uid  + ':' + this.props.user.displayName  + ' is already a player in this game');
+          
+          /*
+          if (this.state.gameInProgress && this.state.localPlayer === this.state.dbCurrentPlayer) {
+            this.dbStopListening(); //because its our turn - we're gonna be pushing all the updates!
+          }
+          */
+
+          if (this.state.dbPlayers[this.props.user.authUser.uid].name !== this.props.user.displayName) {
+            this.updateGamePlayerName();
+          }
         }
       }
-    }
+    });
   }
 
   addUserToGame() {
@@ -367,6 +412,8 @@ class GameFormBase extends React.Component {
     
     let newPlayer = {
       name: this.props.user.displayName,
+      joinTime: this.props.firebase.timestampConstant(),
+      activeTime: this.props.firebase.timestampConstant(),
       score: 0,
     };
 
@@ -443,13 +490,12 @@ class GameFormBase extends React.Component {
       dbPrevRacks: racks,
       dbSets: [],
       dbPrevSets: [],
-      dbLatestMovedTile: null,
-      /*localSelectedTile: null,
-      localSelectedSet: null,*/
+      dbLatestMovedTiles: [],
       localPlayer: playerSequence.indexOf(this.props.user.authUser.uid),
+      localLatestMovedTiles: [],
       }, 
       () => {
-        return this.dbSaveGame();
+        return this.dbSaveGame(true);
       }
     );
   }
@@ -460,7 +506,7 @@ class GameFormBase extends React.Component {
       dbGameInProgress: false,
     }, 
       () => {
-        return this.dbSaveGame();
+        return this.dbSaveGame(false);
       }
     );
   }
@@ -490,7 +536,8 @@ class GameFormBase extends React.Component {
     
     this.setState({
       dbCurrentPlayer: nextPlayer,
-      dbLatestMovedTile: null,
+      dbLatestMovedTiles: [],
+      localLatestMovedTiles: [],
     },
       this.dbSaveGameNextTurn
     );
@@ -501,8 +548,13 @@ class GameFormBase extends React.Component {
     let sets = this.state.dbSets;
     const setTilesMoved = JSON.stringify(this.state.dbSets) !== JSON.stringify(this.state.dbPrevSets);
     if (setTilesMoved) {
-      if (this.state.dbPrevSets) {
+      if (process.env.NODE_ENV !== 'production') console.log('setTilesMoved is true');
+      if (this.state.dbPrevSets && this.state.dbPrevSets.length > 0) {
         sets = this.state.dbPrevSets.slice();
+        if (process.env.NODE_ENV !== 'production') console.log('sets = this.state.dbPrevSets.slice();');
+      }
+      else {
+        sets = [];
       }
       racks[this.state.localPlayer] = this.state.dbPrevRacks[this.state.localPlayer].slice();
     
@@ -516,14 +568,14 @@ class GameFormBase extends React.Component {
         const tileId = bag.splice(0, 1)[0];
         
         //const rackPosition = this.state.racks[this.state.localPlayer].length - 1;
-        this.logDebug('Moving Tile ID ' + tileId + ' from Bag to Rack');
+        if (process.env.NODE_ENV !== 'production') console.log('Moving Tile ID ' + tileId + ' from Bag to Rack');
         
         //const targetTileId = this.state.racks[this.state.localPlayer][rackPosition];
-        racks = this.addTileToRack(tileId, null, racks);
+        racks = this.addTilesToRack([tileId], null, racks);
       }
     }
     else {
-      this.logDebug('Cannot take new tile - tile bag is empty!');
+      if (process.env.NODE_ENV !== 'production') console.log('Cannot take new tile - tile bag is empty!');
       //alert('Tile bag is empty!')
     }
 
@@ -536,70 +588,74 @@ class GameFormBase extends React.Component {
       dbSets: sets,
       dbRacks: racks,
       dbCurrentPlayer: nextPlayer,
-      dbLatestMovedTile: tileId,
+      dbLatestMovedTiles: [],
+      localLatestMovedTiles: [tileId],
     },
       this.dbSaveGameNextTurn
     );
   }
 
-  moveTileFromRackToSet(tileId, setId) {
-    const racks = this.removeTileFromRack(tileId);
-    const sets = this.addTileToSet(tileId, setId);
+  moveTilesFromRackToSet(tiles, setId) {
+    const racks = this.removeTilesFromRack(tiles);
+    const sets = this.addTilesToSet(tiles, setId);
     this.setState({
       dbSets: sets,
       dbRacks: racks,
-      dbLatestMovedTile: tileId,
+      dbLatestMovedTiles: tiles,
+      localLatestMovedTiles: [],
     },
       this.dbSaveGameUpdate
     );
   }
 
-  moveTileFromSetToRack(tileId, setId, targetTileId) {
+  moveTilesFromSetToRack(tiles, setId, targetTileId) {
     
     // tile in set selected - can we move to rack?
     
-    const sets = this.removeTileFromSet(tileId, setId);
-    const racks = this.addTileToRack(tileId, targetTileId, null);
+    const sets = this.removeTilesFromSet(tiles, setId);
+    const racks = this.addTilesToRack(tiles, targetTileId, null);
   
     this.setState({
       dbSets: sets,
       dbRacks: racks,
-      dbLatestMovedTile: tileId,
+      dbLatestMovedTiles: [],
+      localLatestMovedTiles: tiles,
     },
       this.dbSaveGameUpdate
     );
   }
 
-  moveTileFromSetToSet(tileId, setId, targetSetId) {
-    this.logDebug('Moving Tile ID ' + tileId + ' from Set ID ' + setId + ' to Set ID ' + targetSetId);
+  moveTilesFromSetToSet(tiles, setId, targetSetId) {
+    if (process.env.NODE_ENV !== 'production') console.log('Moving ' + tiles.length + ' tile(s) from Set ID ' + setId + ' to Set ID ' + targetSetId);
     
-    let sets = this.removeTileFromSet(tileId, setId);
-    sets = this.addTileToSet(tileId, targetSetId, sets);
+    let sets = this.removeTilesFromSet(tiles, setId);
+    sets = this.addTilesToSet(tiles, targetSetId, sets);
     
     this.setState({
       dbSets: sets,
-      dbLatestMovedTile: tileId,
+      dbLatestMovedTiles: tiles,
+      localLatestMovedTiles: [],
     },
       this.dbSaveGameUpdate
     );
   }
 
-  moveTileWithinRack(tileId, targetTileId) {
-    this.logDebug('Moving Tile ID ' + tileId + ' to location ' + targetTileId + ' in Rack');
+  moveTilesWithinRack(tiles, targetTileId) {
+    if (process.env.NODE_ENV !== 'production') console.log('Moving ' + tiles.length + ' tile(s) to location ' + targetTileId + ' in Rack');
     
-    let racks = this.removeTileFromRack(tileId);
-    racks = this.addTileToRack(tileId, targetTileId, racks);
+    let racks = this.removeTilesFromRack(tiles);
+    racks = this.addTilesToRack(tiles, targetTileId, racks);
     
     this.setState({
       dbRacks: racks,
-      localLatestMovedTile: tileId,
+      localLatestMovedTiles: tiles,
     },
       this.dbSaveGameUpdate
     );
   } 
 
   sortRack(byRank) {
-    this.logDebug('Sorting rack');
+    if (process.env.NODE_ENV !== 'production') console.log('Sorting rack');
     
     const racks = this.state.dbRacks.slice();
     const localRack = racks[this.state.localPlayer].slice();
@@ -631,7 +687,7 @@ class GameFormBase extends React.Component {
 
     this.setState({
       dbRacks: racks,
-      localLatestMovedTile: null,
+      localLatestMovedTiles: [],
     },
       this.dbSaveGameUpdate
     );
@@ -640,25 +696,29 @@ class GameFormBase extends React.Component {
 
   /********** BUSINESS LOGIC - helper functions **********/
 
-  removeTileFromRack(tileId) {
-    this.logDebug('Removing Tile ID ' + tileId + ' from Rack');
+  removeTilesFromRack(tiles) {
+    if (process.env.NODE_ENV !== 'production') console.log('Removing ' + tiles.length + ' tile(s) from Rack');
     const racks = this.state.dbRacks.slice();
     const localRack = racks[this.state.localPlayer].slice();
+    
     // don't actually remove, convert to an empty tile (id = unique negative number)
     //const nextId = Math.min(...localRack, 0) - 1;
     let nextId = -1;
-    while (localRack.indexOf(nextId) >= 0) {
-      nextId--
-    }
-    this.logDebug(' ...next id: ' + nextId);
-    localRack[localRack.indexOf(tileId)] = nextId;
+    tiles.forEach(tileId => {
+      while (localRack.indexOf(nextId) >= 0) {
+        nextId--
+      }
+      if (process.env.NODE_ENV !== 'production') console.log(' ...replacing Tile ID ' + tileId + ' with ' + nextId);
+      localRack[localRack.indexOf(tileId)] = nextId--;
+    });
+    
     racks[this.state.localPlayer] = localRack;
 
     return racks;
   }
   
-  addTileToRack(tileId, targetTileId, racks) {
-    this.logDebug('Adding Tile ID ' + tileId + ' to Rack at position ' + targetTileId);
+  addTilesToRack(tiles, targetTileId, racks) {
+    if (process.env.NODE_ENV !== 'production') console.log('Adding ' + tiles.length + ' tile(s) to Rack at position ' + targetTileId);
     
     if (!racks) {
       racks = this.state.dbRacks.slice();
@@ -672,83 +732,87 @@ class GameFormBase extends React.Component {
       // Later in this method, if rack is found to be full then will add tile at end, rather than shift existing tiles to right.
     }
     
-    // Find the closest empty space to targetTileId
-    let i = targetIndex;
-    let j = targetIndex + 1;
-    let gapFoundIndex = null;
-    while (i >= 0 || j < localRack.length) {
-      if (i >= 0 && localRack[i] < 0) {
-        gapFoundIndex = i;
-        break;
+    tiles.forEach(tileId => {
+      // Find the closest empty space to targetTileId
+      let i = targetIndex;
+      let j = targetIndex + 1;
+      let gapFoundIndex = null;
+      while (i >= 0 || j < localRack.length) {
+        if (i >= 0 && localRack[i] < 0) {
+          gapFoundIndex = i;
+          break;
+        }
+        i--;
+        if (j < localRack.length && localRack[j] < 0) {
+          gapFoundIndex = j;
+          break;
+        }
+        j++;
       }
-      i--;
-      if (j < localRack.length && localRack[j] < 0) {
-        gapFoundIndex = j;
-        break;
+      
+      if (gapFoundIndex === null) {
+        if (targetTileId === null) {
+          targetIndex = localRack.length;
+          if (process.env.NODE_ENV !== 'production') console.log(' ...rack full, no gaps. Adding new tile at end of rack at index: ' + targetIndex);
+        }
+        else {
+          gapFoundIndex = localRack.length;
+          if (process.env.NODE_ENV !== 'production') console.log(' ...rack full, no gaps. Shifting tiles right and adding new tile at index: ' + targetIndex);
+        }
       }
-      j++;
-    }
-    
-    if (gapFoundIndex === null) {
-      if (targetTileId === null) {
-        targetIndex = localRack.length;
-        this.logDebug(' ...rack full, no gaps. Adding new tile at end of rack at index: ' + targetIndex);
-      }
-      else {
-        gapFoundIndex = localRack.length;
-        this.logDebug(' ...rack full, no gaps. Shifting tiles right and adding new tile at index: ' + targetIndex);
-      }
-    }
 
-    // Shift tiles (unless rack is full and we've already decided to add to a new position at end of rack)
-    if (gapFoundIndex !== null) {
-      // Shift tiles into gap to make way for new tile
-      this.logDebug(' ...targetIndex: ' + targetIndex + '  gapFoundIndex: ' + gapFoundIndex);
-      if (gapFoundIndex >= targetIndex) {
-        //shift right
-        this.logDebug(' ...shifting right' + targetIndex);
-        for (let i = gapFoundIndex; i > targetIndex; i--) {
-          localRack[i] = localRack[i-1];
+      // Shift tiles (unless rack is full and we've already decided to add to a new position at end of rack)
+      if (gapFoundIndex !== null) {
+        // Shift tiles into gap to make way for new tile
+        if (process.env.NODE_ENV !== 'production') console.log(' ...targetIndex: ' + targetIndex + '  gapFoundIndex: ' + gapFoundIndex);
+        if (gapFoundIndex >= targetIndex) {
+          //shift right
+          if (process.env.NODE_ENV !== 'production') console.log(' ...shifting right' + targetIndex);
+          for (let i = gapFoundIndex; i > targetIndex; i--) {
+            localRack[i] = localRack[i-1];
+          }
+        }
+        else {
+          //shift left
+          if (process.env.NODE_ENV !== 'production') console.log(' ...shifting left' + targetIndex);
+          for (let i = gapFoundIndex; i < targetIndex; i++) {
+            localRack[i] = localRack[i+1];
+          }
         }
       }
-      else {
-        //shift left
-        this.logDebug(' ...shifting left' + targetIndex);
-        for (let i = gapFoundIndex; i < targetIndex; i++) {
-          localRack[i] = localRack[i+1];
-        }
-      }
-    }
-    
-    // place new tile
-    localRack[targetIndex] = tileId;
+      
+      // place new tile
+      localRack[targetIndex] = tileId;
+    });
 
     racks[this.state.localPlayer] = localRack;
     return racks;
   }
 
-  removeTileFromSet(tileId, setId) {
+  removeTilesFromSet(tiles, setId) {
     const sets = this.state.dbSets.slice();
     const setIndex = sets.findIndex(a => a.id === setId);
     const sourceSetTiles = sets[setIndex].tiles.slice();
-    this.logDebug('Removing Tile ID ' + tileId + ' from Set ID ' + setId+ ' (index ' + setIndex + ')');
+    if (process.env.NODE_ENV !== 'production') console.log('Removing ' + tiles.length + ' tile(s) from Set ID ' + setId + ' (index ' + setIndex + ')');
     
-    const tileIndex = sourceSetTiles.indexOf(tileId);
-    this.logDebug(' ...removing tile index ' + tileIndex);
-    sourceSetTiles.splice(tileIndex, 1);
+    tiles.forEach(tileId => {
+      const tileIndex = sourceSetTiles.indexOf(tileId);
+      if (process.env.NODE_ENV !== 'production') console.log(' ...removing Tile ID ' + tileId + ' at index ' + tileIndex);
+      sourceSetTiles.splice(tileIndex, 1);
+    });
     
     if (sourceSetTiles.length > 0) {
       sets[setIndex] = {id: setId, tiles: sourceSetTiles};
     }
     else {
-      this.logDebug(' ...removing Set ID ' + setId + ' (index ' + setIndex + ') because it is now empty');
+      if (process.env.NODE_ENV !== 'production') console.log(' ...removing Set ID ' + setId + ' (index ' + setIndex + ') because it is now empty');
       sets.splice(setIndex, 1);
     }
     return sets;
   }
     
-  addTileToSet(tileId, setId, sets) {
-    this.logDebug('Adding Tile ID ' + tileId + ' to Set ID ' + setId);
+  addTilesToSet(tiles, setId, sets) {
+    if (process.env.NODE_ENV !== 'production') console.log('Adding ' + tiles.length + ' tile(s) to Set ID ' + setId);
     
     if (!sets) {
       if (!this.state.dbSets) { 
@@ -762,17 +826,17 @@ class GameFormBase extends React.Component {
     if (setId < 0) {
       // brand new set - create it
       const targetSetTiles = [];
-      targetSetTiles.push(tileId);
+      targetSetTiles.push(...tiles);
       const newSetId = Math.max(...sets.map(a => a.id), 0) + 1;
-      this.logDebug(' ... creating new Set ID ' + newSetId);
+      if (process.env.NODE_ENV !== 'production') console.log(' ... creating new Set ID ' + newSetId);
       sets.push({id: newSetId, tiles: targetSetTiles});
       return sets;
     } 
     else {
       const setIndex = sets.findIndex(a => a.id === setId);
-      this.logDebug(' ... adding to existing Set ID ' + setId + ' (index ' + setIndex + ')');
+      if (process.env.NODE_ENV !== 'production') console.log(' ... adding to existing Set ID ' + setId + ' (index ' + setIndex + ')');
       const targetSetTiles = sets[setIndex].tiles.slice();
-      targetSetTiles.push(tileId);
+      targetSetTiles.push(...tiles);
       sets[setIndex] = {id: setId, tiles: targetSetTiles};
       return sets;
     }
@@ -820,6 +884,10 @@ class GameFormBase extends React.Component {
   }
 
   handleSetValidityUpdate(invalidCount) {
+    // TODO: anti-pattern - need to refactor!!
+    // This function is called from render method of Board component.
+    // Must never set state from within render method.
+    // "Render methods should be a pure function of props and state"
     if (invalidCount !== this.state.invalidSetCount) {
       this.setState({
         invalidSetCount: invalidCount,
@@ -838,7 +906,8 @@ class GameFormBase extends React.Component {
       // host can abandon game...
       buttons.push({
         id: 'exit', 
-        label: 'Abandon Game', 
+        icon: <Icons.CrossIcon className='svg-icon-button' />,
+          label: 'Abandon Game', 
         onClick: () => this.handleClickExitGame(),
       });
     }
@@ -856,6 +925,7 @@ class GameFormBase extends React.Component {
         //if tiles placed...
         buttons.push({
           id: 'reset', 
+          icon: <Icons.CircleBackIcon className='svg-icon-button' />,
           label: 'Reset Turn', 
           onClick: () => this.handleClickResetTurn(),
         });
@@ -865,6 +935,7 @@ class GameFormBase extends React.Component {
         //if tiles placed and board is valid...
         buttons.push({
           id: 'complete', 
+          icon: <Icons.TickIcon className='svg-icon-button' />,
           label: 'Complete Turn', 
           className: 'successbutton',
           onClick: () => this.handleClickCompleteTurn(),
@@ -873,6 +944,7 @@ class GameFormBase extends React.Component {
       else {
         buttons.push({
           id: 'skip', 
+          icon: <Icons.TickIcon className='svg-icon-button' />,
           label: 'Skip Turn', 
           onClick: () => this.handleClickSkipTurn(),
         });
@@ -914,16 +986,19 @@ class GameFormBase extends React.Component {
         dbPrevRacks = {this.state.dbPrevRacks}
         dbSets = {this.state.dbSets}
         dbCurrentPlayer = {this.state.dbCurrentPlayer}
-        dbLatestMovedTile = {this.state.dbLatestMovedTile}
+        dbLatestMovedTiles = {this.state.dbLatestMovedTiles}
+        dbLastTurnTime = {this.state.dbLastTurnTime}
+        estimatedServerTimeMs = {this.state.estimatedServerTimeMs}
+        gameId = {this.state.gameId}  
         uid = {this.props.user.authUser && this.props.user.authUser.uid}
         localPlayer = {this.state.localPlayer}
-        localLatestMovedTile = {this.state.localLatestMovedTile}
+        localLatestMovedTiles = {this.state.localLatestMovedTiles}
         buttons={this.getActionBarButtons()}
         rackButtons={this.getRackButtons()}
-        onMoveTileFromRackToSet={(tileId, setId) => this.moveTileFromRackToSet(tileId, setId)}
-        onMoveTileFromSetToRack={(tileId, setId, targetTileId) => this.moveTileFromSetToRack(tileId, setId, targetTileId)}
-        onMoveTileFromSetToSet={(tileId, setId, targetSetId) => this.moveTileFromSetToSet(tileId, setId, targetSetId)}
-        onMoveTileWithinRack={(tileId, targetTileId) => this.moveTileWithinRack(tileId, targetTileId)}
+        onMoveTilesFromRackToSet={(tileId, setId) => this.moveTilesFromRackToSet(tileId, setId)}
+        onMoveTilesFromSetToRack={(tileId, setId, targetTileId) => this.moveTilesFromSetToRack(tileId, setId, targetTileId)}
+        onMoveTilesFromSetToSet={(tileId, setId, targetSetId) => this.moveTilesFromSetToSet(tileId, setId, targetSetId)}
+        onMoveTilesWithinRack={(tileId, targetTileId) => this.moveTilesWithinRack(tileId, targetTileId)}
         onSetValidityUpdate={(invalidCount) => this.handleSetValidityUpdate(invalidCount)}
       />;
     
@@ -946,12 +1021,19 @@ class GameFormBase extends React.Component {
           (this.state.dbGameInProgress ? gameComponent : lobbyComponent) :
           !this.state.loading && <NotFound />}
         {(this.state.loading) && <Loading />}
-        {(this.state.saving) && <Loading inTitle={true} />}
+        {(this.state.saving) && <Loading className="title" />}
       </div>
     );
   }
 }
 
-const GameForm = withRouter(withFirebase(GameFormBase));
+const GamePage = props => (
+  <AuthUserContext.Consumer>
+    {user => (
+      <GamePageBase {...props} user={user} />
+    )}
+  </AuthUserContext.Consumer>
+);
 
-export default GamePage;
+export default withRouter(withFirebase(GamePage));
+

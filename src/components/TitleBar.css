@@ -42,16 +42,20 @@
     background: var(--menu-active-background-color);
   }
 
-  .menulink img {
+  .menulink svg {
     /*float: left;*/
     padding-right: 5px;
     vertical-align: middle;
+    width: 20px;
+    height: 20px;
   }
 
-  .userlink img {
+  .userlink svg {
     /*float: right;*/
     padding-left: 5px;
     vertical-align: middle;
+    width: 20px;
+    height: 20px;
   }
 
   .menulink span, .userlink span {
@@ -59,7 +63,7 @@
   }
  
   .menulink i {
-    color: var(--emphasis-color-light);
-    font-size: 13pt;
+    color: var(--emphasis-color-titlebar);
+    font-size: 12.5pt;
     font-family: "Times New Roman", Times, serif; 
   }

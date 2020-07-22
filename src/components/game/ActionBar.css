@@ -17,12 +17,12 @@
 
   .actionbutton {
     background: var(--button-background);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--button-box-shadow);
     border: none;
     border-radius: 3px;
-    font-size: 14px;
+    /*font-size: 14px;*/
     /*font-weight: bold;*/
-    color: var(--button-text-color);
+    /*color: var(--button-text-color);*/
     margin: 5px;
     padding: 8px;
     display:inline-block;
@@ -43,13 +43,13 @@
   }
 
   .successbutton {
-    background: var(--success-color);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    background: var(--green-button-background);
+    box-shadow: var(--button-box-shadow);
     border: none;
     border-radius: 3px;
-    font-size: 14px;
+    /*font-size: 14px;*/
     /*font-weight: bold;*/
-    color: var(--button-text-color);
+    /*color: var(--button-text-color);*/
     margin: 5px;
     padding: 8px;
     display:inline-block;
@@ -58,14 +58,31 @@
   }
 
   .successbutton:hover {
-    background: var(--button-hover-background);
+    background: var(--green-button-hover-background);
   }
 
   .successbutton:active {
-    background: var(--button-active-background);
+    background: var(--green-button-active-background);
     cursor: default;
   }
   .successbutton:focus {
     outline: none;
   }
   
+
+
+  .actionbutton svg, .successbutton svg {
+    width: 18px;
+    height: 18px;
+    /*color: var(--button-text-color);*/
+    vertical-align: middle;
+    
+  }
+
+  .actionbutton span, .successbutton span {
+    font-size: 14px;
+    color: var(--button-text-color);
+    margin: 0px;
+    vertical-align: middle;
+    
+  }

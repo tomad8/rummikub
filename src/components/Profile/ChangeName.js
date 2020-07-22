@@ -7,7 +7,7 @@ class ChangeName extends React.Component {
     super(props);
 
     this.state = { 
-      displayName: this.props.user.displayName,
+      displayName: this.props.user.displayName ?? '',
       error: null, };
   }
 

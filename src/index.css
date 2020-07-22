@@ -17,35 +17,42 @@
 
   --emphasis-color-light: rgb(211, 168, 120);
   --emphasis-color-dark: rgb(231, 116, 0);
-
+  --emphasis-color-titlebar: rgb(204, 175, 141);
+  
   --menu-background-color: rgb(47, 52, 63);
   --menu-text-color: rgb(145, 166, 202);
   --menu-hover-background-color: rgba(69, 77, 95, 0.6);
   --menu-active-background-color: rgba(69, 77, 95, 0.2);
   
-  --panel-background-color: rgb(215, 221, 233); /*rgb(215, 221, 233);*/
+  --panel-background-color: rgb(228, 233, 241); /*rgb(215, 221, 233);*/
   --panel-emphasis-background-color: var(--emphasis-color-dark);
   --panel-emphasis-text-color: white; /*rgb(192, 201, 216); */
-      
-  --button-background: rgb(100, 120, 156);
+  --panel-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+
   --button-text-color: white;
+  --button-background: rgb(100, 120, 156);
   --button-hover-background: rgb(123, 143, 177);
   --button-active-background: rgb(73, 92, 124);
   --button-disabled-background: rgb(181, 186, 196);
+  --button-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 
+  --green-button-background: rgb(113, 163, 80);
+  --green-button-hover-background: rgb(129, 187, 91);
+  --green-button-active-background: rgb(86, 124, 61);
+ 
   --highlight-color: rgb(33, 160, 214);
   --highlight-fade-color: rgba(33, 160, 214, 0.5);
   
   --error-color: rgb(158, 21, 21);
   --success-color: rgb(68, 170, 0);
 
-  --board-color: rgba(182, 192, 212, 0.5); /*rgb(215, 221, 233);*/
-  --rack-color: rgba(182, 192, 212, 0.5); /*rgb(215, 221, 233);*/
+  --board-color: rgba(182, 192, 212, 0.4); /*rgb(215, 221, 233);*/
+  --rack-color: rgba(182, 192, 212, 0.4); /*rgb(215, 221, 233);*/
 
   --set-background-color: rgb(234, 237, 243); 
   --set-border-color: #aaa;
   --set-hover-color: #777;
-  --set-empty-color: rgb(192, 201, 216);
+  --set-empty-color: rgb(198, 206, 221);
   
   --tile-gradient-light: rgb(238, 224, 209);
   --tile-gradient-dark: rgb(212, 199, 185);
@@ -75,9 +82,10 @@
   --link-hover-color: rgb(220, 150, 70);
   --note-color: var(--title-color);
 
-  --emphasis-color-light: rgb(204, 175, 141);
-  --emphasis-color-dark: rgb(220, 150, 70);
-
+  --emphasis-color-light: rgb(220, 150, 70);
+  --emphasis-color-dark: rgb(204, 175, 141);
+  --emphasis-color-titlebar: rgb(204, 175, 141);
+  
   --menu-background-color: rgb(47, 52, 63);
   --menu-text-color: var(--title-color);
   --menu-hover-background-color: rgba(69, 77, 95, 0.6);
@@ -86,12 +94,18 @@
   --panel-background-color: rgb(47, 52, 63);
   --panel-emphasis-background-color: var(--emphasis-color-dark);
   --panel-emphasis-text-color: black; /*rgb(192, 201, 216); */
-  
-  --button-background: rgb(113, 178, 204);
+  --panel-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
   --button-text-color: black;
+  --button-background: rgb(113, 178, 204);
   --button-hover-background: rgb(135, 206, 235);
   --button-active-background: rgb(92, 143, 165);
   --button-disabled-background: rgb(81, 88, 104);
+  --button-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+
+  --green-button-background: rgb(120, 221, 120);
+  --green-button-hover-background: rgb(163, 255, 163);
+  --green-button-active-background: rgb(78, 155, 78);
 
   --highlight-color: rgb(33, 160, 214);
   --highlight-fade-color: rgba(33, 160, 214, 0.5);
@@ -105,7 +119,7 @@
   --set-background-color: var(--body-background-color);
   --set-border-color:  rgb(32, 32, 32);
   --set-hover-color:  rgb(138, 126, 116);
-  --set-empty-color:  var(--body-background-color);
+  --set-empty-color:  rgb(37, 40, 48); /*var(--body-background-color);*/
   
   --tile-gradient-light: rgb(80, 73, 67);
   --tile-gradient-dark: rgb(65, 60, 55);
@@ -173,7 +187,7 @@ code {
   background: var(--panel-background-color);
   border: none;
   border-radius: 3px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--panel-box-shadow);
   text-align: center;
   padding: 5px;
   animation: notification-fade 3s both;

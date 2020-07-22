@@ -22,11 +22,11 @@
     margin-top: 10px;
     margin-bottom: 10px;
   }
-
-  .loadingspinner-fixed {
+  
+ .loadingspinner-fixed {
     display: inline-block;
     position: fixed;
-    margin-left: calc( -2 * var(--offset));
+    margin-left: calc( (-2 * var(--offset)) + 1px);
     top: 100px;
   }
 
@@ -35,7 +35,7 @@
     --offset: 12px;
     display: inline-block;
     position: fixed;
-    margin-left: calc( -2 * var(--offset));
+    margin-left: calc( (-2 * var(--offset)) + 1px);
     top: -2px;
   }
 
@@ -43,7 +43,15 @@
     position: relative;
   }
 
+  .loadingspinner-inline-small {
+    --square: 10px;
+    --offset: 12px;
+    position: relative;
+    width: calc( 4 * var(--offset));
+    height: calc( 3 * var(--offset));
+  }
 
+ 
 
   .loadingspinner div {
     display: inline-block;

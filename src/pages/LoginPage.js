@@ -11,13 +11,8 @@ const INITIAL_STATE = {
   error: null,
 };
 
-const LoginPage = () => (
-  <div className='loginpage'>
-    <LoginForm />
-  </div>
-);
 
-class LoginFormBase extends React.Component {
+class LoginPageBase extends React.Component {
   constructor(props) {
     super(props);
  
@@ -53,6 +48,11 @@ class LoginFormBase extends React.Component {
   }
 }
 
-const LoginForm = withRouter(withFirebase(LoginFormBase));
- 
-export default LoginPage;
+
+const LoginPage = props => (
+  <div className='loginpage'>
+    <LoginPageBase {...props} />
+  </div>
+);
+
+export default withRouter(withFirebase(LoginPage));

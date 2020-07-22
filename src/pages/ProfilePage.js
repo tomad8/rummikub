@@ -6,18 +6,7 @@ import { AuthUserContext } from '../components/Session';
 import ChangeName from '../components/Profile/ChangeName';
 
 
-const ProfilePage = () => (
-  <AuthUserContext.Consumer>
-    {user => (
-      <div className='profilepage'>
-       <ProfileForm user={user} />
-      </div>
-    )}
-  </AuthUserContext.Consumer>
-);
-
-
-class ProfileFormBase extends React.Component {
+class ProfilePageBase extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -81,6 +70,14 @@ class ProfileFormBase extends React.Component {
   }
 }
 
-const ProfileForm = withRouter(withFirebase(ProfileFormBase));
+const ProfilePage = props => (
+  <AuthUserContext.Consumer>
+    {user => (
+      <div className='profilepage'>
+       <ProfilePageBase {...props} user={user} />
+      </div>
+    )}
+  </AuthUserContext.Consumer>
+);
 
-export default ProfilePage;
+export default withRouter(withFirebase(ProfilePage));
