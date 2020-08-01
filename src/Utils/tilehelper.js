@@ -88,6 +88,20 @@ import * as Constants from '../constants';
     }
 
 
+    export function getTilePointsFromId(id) {
+      let points = getTileRankFromId(id);
+
+      if (points === Constants.JOKER_DISPLAY_CHARACTER) {
+        points = Constants.JOKER_POINTS_PENALTY;
+      }
+      else if (typeof points !== 'number') {
+        points = 0;
+      }
+  
+      return points;
+    }
+
+
   export function isJoker(id) {
     return (id >= getStandardTileCount() && id < getTotalTileCount());
   }

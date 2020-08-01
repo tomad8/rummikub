@@ -38,6 +38,7 @@ class GamePageBase extends React.Component {
       dbLatestMovedTiles: [],
       dbLastUpdateTime: null,
       dbLastTurnTime: null,
+      dbGameHasEnded: false,
       localLatestMovedTiles: [],
       estimatedServerTimeMs: null,
       serverTimeOffsetMs: null,
@@ -72,6 +73,8 @@ class GamePageBase extends React.Component {
               joinTime: this.props.firebase.timestampConstant(),
               activeTime: this.props.firebase.timestampConstant(),
               score: 0,
+              gamesPlayed: 0,
+              gamesWon: 0,
             },
           },
         },
@@ -143,6 +146,7 @@ class GamePageBase extends React.Component {
               dbLatestMovedTiles: snapshot.val().latestMovedTiles,
               dbLastUpdateTime: snapshot.val().lastUpdateTime,
               dbLastTurnTime: snapshot.val().lastTurnTime,
+              dbGameHasEnded: snapshot.val().gameHasEnded,
               localPlayer: snapshot.val().playerSequence && snapshot.val().playerSequence.indexOf(this.props.user.authUser.uid),
               loading: false,
               listening: true,
@@ -180,6 +184,7 @@ class GamePageBase extends React.Component {
     const data = {
       host: this.state.dbHost,
       gameInProgress: this.state.dbGameInProgress,
+      gameHasEnded: this.state.dbGameHasEnded,
       /*players: this.state.dbPlayers,*/
       playerSequence: this.state.dbPlayerSequence,
       currentPlayer: this.state.dbCurrentPlayer,
@@ -187,17 +192,28 @@ class GamePageBase extends React.Component {
       lastTurnTime: this.props.firebase.timestampConstant(),
     };
     
-    // only save full players list on first creation of game by host
+    // only save full players list on first creation of game by host, or on completion of game (to update scores)
     if (savePlayers) {
       data['players'] = this.state.dbPlayers;
     }
     else {
       const player = {
-        name: this.state.dbPlayers[this.props.user.authUser.uid].name,
-        joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,
+        /*name: this.state.dbPlayers[this.props.user.authUser.uid].name,
+        joinTime: this.state.dbPlayers[this.props.user.authUser.uid].joinTime,*/
         activeTime: this.props.firebase.timestampConstant(), //active time is always refreshed
-        score: this.state.dbPlayers[this.props.user.authUser.uid].score,
+        /*score: this.state.dbPlayers[this.props.user.authUser.uid].score,*/
+        /*gamesPlayed: this.state.dbPlayers[this.props.user.authUser.uid].gamesPlayed,
+        gamesWon: this.state.dbPlayers[this.props.user.authUser.uid].gamesWon,*/
       };
+      
+      // Only update following if defined (to retain compatibility with games saved by previous versions)
+      /*if (this.state.dbPlayers[this.props.user.authUser.uid].gamesPlayed) {
+        data['gamesPlayed'] = this.state.dbPlayers[this.props.user.authUser.uid].gamesPlayed;
+      }
+      if (this.state.dbPlayers[this.props.user.authUser.uid].gamesWon) {
+        data['gamesWon'] = this.state.dbPlayers[this.props.user.authUser.uid].gamesWon;
+      }*/
+
       data['/players/' + this.props.user.authUser.uid] = player;
     }
 
@@ -302,7 +318,9 @@ class GamePageBase extends React.Component {
     const gameId = this.state.gameId;
     
     const updates = {};
-    updates['/currentPlayer'] = this.state.dbCurrentPlayer;
+    if (this.state.dbCurrentPlayer >= 0) {
+      updates['/currentPlayer'] = this.state.dbCurrentPlayer;
+    }
     if (this.state.dbLatestMovedTiles) {
       updates['/latestMovedTiles'] = this.state.dbLatestMovedTiles;
     }
@@ -415,6 +433,8 @@ class GamePageBase extends React.Component {
       joinTime: this.props.firebase.timestampConstant(),
       activeTime: this.props.firebase.timestampConstant(),
       score: 0,
+      gamesPlayed: 0,
+      gamesWon: 0,
     };
 
     this.setState({ 
@@ -504,9 +524,11 @@ class GamePageBase extends React.Component {
     //initialise state
     this.setState({
       dbGameInProgress: false,
+      dbGameHasEnded: false,
+      dbCurrentPlayer: 0,
     }, 
       () => {
-        return this.dbSaveGame(false);
+        return this.dbSaveGame(true);
       }
     );
   }
@@ -530,17 +552,80 @@ class GamePageBase extends React.Component {
   }
 
   completeTurn() {
-    const nextPlayer = this.state.dbCurrentPlayer + 1 >= this.state.dbPlayerSequence.length 
-      ? 0 
-      : this.state.dbCurrentPlayer + 1;
+    // Check if player has won
+    if (process.env.NODE_ENV !== 'production') console.log('Checking rack - length: ' + this.state.dbRacks[this.state.dbCurrentPlayer].length);
     
-    this.setState({
-      dbCurrentPlayer: nextPlayer,
-      dbLatestMovedTiles: [],
-      localLatestMovedTiles: [],
-    },
-      this.dbSaveGameNextTurn
-    );
+    if (this.state.dbRacks[this.state.dbCurrentPlayer].filter(t => t>=0).length === 0) {
+      if (process.env.NODE_ENV !== 'production') console.log('Current player has emptied rack - Winner!');
+      
+      const players = this.calculateScores();
+
+      this.setState({
+        dbGameHasEnded: true,
+        dbCurrentPlayer: null,
+        dbPlayers: players,
+        dbLatestMovedTiles: [],
+        localLatestMovedTiles: [],
+      },
+        () => {
+          return this.dbSaveGame(true);
+        }
+      );
+    }
+    else {
+      // Move play to next player
+      const nextPlayer = this.state.dbCurrentPlayer + 1 >= this.state.dbPlayerSequence.length 
+        ? 0 
+        : this.state.dbCurrentPlayer + 1;
+      
+      this.setState({
+        dbCurrentPlayer: nextPlayer,
+        dbLatestMovedTiles: [],
+        localLatestMovedTiles: [],
+      },
+        this.dbSaveGameNextTurn
+      );
+    }
+  }
+
+  calculateScores() {
+    //let players = this.state.dbPlayers.slice();
+    let players = Object.assign({}, this.state.dbPlayers);
+    let pointsSum = 0;
+
+    for (let p = 0; this.state.dbPlayerSequence && p < this.state.dbPlayerSequence.length; p++) {
+      const uid = this.state.dbPlayerSequence[p];
+      //const player = this.state.dbPlayers[uid].slice();
+      const player = Object.assign({}, this.state.dbPlayers[uid]);
+      
+      const points = this.state.dbRacks[p]
+                        .filter(t => t>=0)
+                        .reduce((prev, curr) => (prev += TileHelper.getTilePointsFromId(curr)), 0);
+      
+      
+      
+      if (process.env.NODE_ENV !== 'production') console.log('User ' + uid + ' - games played (before): ' + player['gamesPlayed']);
+      
+
+      player['gamesPlayed'] = (player['gamesPlayed'] ?? 0) + 1;
+
+      if (process.env.NODE_ENV !== 'production') console.log('User ' + uid + ' - games played: (after)' + player['gamesPlayed']);
+      
+      if (uid !== this.props.user.authUser.uid) {
+        player['lastGameScore'] = -points;
+        player['score'] = (player['score'] ?? 0) - points;
+      }
+      
+      players[uid] = player;
+      
+      pointsSum += points;
+    }
+
+    players[this.props.user.authUser.uid]['lastGameScore'] = pointsSum;
+    players[this.props.user.authUser.uid]['score'] = (players[this.props.user.authUser.uid]['score'] ?? 0) + pointsSum;
+    players[this.props.user.authUser.uid]['gamesWon'] = (players[this.props.user.authUser.uid]['gamesWon'] ?? 0) + 1;
+    
+    return players;
   }
 
   moveTileFromBagToRackAndSkipTurn() {
@@ -562,7 +647,7 @@ class GamePageBase extends React.Component {
     
     let bag = this.state.dbTileBag;
     let tileId = null;
-    if (this.state.dbTileBag.length > 0) {
+    if (this.state.dbTileBag && this.state.dbTileBag.length > 0) {
       if (this.state.dbRacks) {
         bag = this.state.dbTileBag.slice();
         const tileId = bag.splice(0, 1)[0];
@@ -888,6 +973,12 @@ class GamePageBase extends React.Component {
     // This function is called from render method of Board component.
     // Must never set state from within render method.
     // "Render methods should be a pure function of props and state"
+    
+    /*if (0 !== this.state.invalidSetCount) {
+      this.setState({
+        invalidSetCount: 0,
+      });
+    }*/
     if (invalidCount !== this.state.invalidSetCount) {
       this.setState({
         invalidSetCount: invalidCount,
@@ -903,13 +994,24 @@ class GamePageBase extends React.Component {
     const buttons = [];
     
     if (this.props.user.authUser && this.props.user.authUser.uid === this.state.dbHost) {
-      // host can abandon game...
-      buttons.push({
-        id: 'exit', 
-        icon: <Icons.CrossIcon className='svg-icon-button' />,
-          label: 'Abandon Game', 
-        onClick: () => this.handleClickExitGame(),
-      });
+      
+      // host can end/abandon game...
+      if (this.state.dbGameHasEnded) {
+        buttons.push({
+          id: 'next', 
+          icon: <Icons.NextIcon className='svg-icon-button' />,
+            label: 'Next Game', 
+          onClick: () => this.handleClickExitGame(),
+        });
+      }
+      else {
+        buttons.push({
+          id: 'exit', 
+          icon: <Icons.CrossIcon className='svg-icon-button' />,
+            label: 'Abandon Game', 
+          onClick: () => this.handleClickExitGame(),
+        });
+      }
     }
     
     if (this.state.dbCurrentPlayer === this.state.localPlayer){
@@ -988,6 +1090,7 @@ class GamePageBase extends React.Component {
         dbCurrentPlayer = {this.state.dbCurrentPlayer}
         dbLatestMovedTiles = {this.state.dbLatestMovedTiles}
         dbLastTurnTime = {this.state.dbLastTurnTime}
+        dbGameHasEnded = {this.state.dbGameHasEnded}
         estimatedServerTimeMs = {this.state.estimatedServerTimeMs}
         gameId = {this.state.gameId}  
         uid = {this.props.user.authUser && this.props.user.authUser.uid}
