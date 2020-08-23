@@ -21,7 +21,7 @@ const TitleBar = () => (
           <Link className='userlink' to={ROUTES.PROFILE}>
             <span>{user && user.authUser ? user.displayName : ""}</span>
             {/*<img src={usericon} alt="User icon" className="usericon" height="25px" width="25px" />*/}
-            <Icons.UserIcon className='svg-icon-emphasis'/>
+            <Icons.UserIcon className='svg-icon-titlebar'/>
           </Link>
         </div>
       </div>

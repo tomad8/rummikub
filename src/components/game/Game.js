@@ -7,7 +7,7 @@ import Board from './Board';
 import Rack from './Rack';
 import ActionBar from './ActionBar';
 import GamePlayers from './GamePlayers';
-
+import GameResults from './GameResults';
 
 class Game extends React.Component {
   constructor(props) {
@@ -15,8 +15,8 @@ class Game extends React.Component {
     this.state = {
       localSelectedTiles: [],
       localSelectedSet: null,
-      debugMode: (process.env.NODE_ENV !== 'production'),
-      //debugMode: false,
+      //debugMode: (process.env.NODE_ENV !== 'production'),
+      debugMode: false,
     };
   }
   
@@ -268,7 +268,8 @@ class Game extends React.Component {
 
   // tile is fresh if it was played by the current player in the current turn (i.e. existed on players rack at start of turn)
   isFresh(tileId) {
-    return this.props.dbPrevRacks[this.props.dbCurrentPlayer].indexOf(tileId) >= 0;
+    return this.props.dbCurrentPlayer !== null && this.props.dbCurrentPlayer >= 0 
+      && this.props.dbPrevRacks[this.props.dbCurrentPlayer].indexOf(tileId) >= 0;
   }
 
   sortSet(tiles) {
@@ -603,25 +604,27 @@ class Game extends React.Component {
   }
 
   render() {
-    const debugRacks = [];
-    if (this.state.debugMode) {
+    const otherPlayerRacks = [];
+    if (this.props.dbGameHasEnded || this.state.debugMode) {
       for (let r = 0; this.props.dbRacks && r < this.props.dbRacks.length; r++) {
         const uid = this.props.dbPlayerSequence[r];
-        debugRacks.push(
-          <Rack 
-            key={r}  
-            player={this.props.dbPlayers[uid] && r + ': ' + this.props.dbPlayers[uid].name}
-            tiles={this.getTilesRack(r)}
-            debug={this.state.debugMode}
-            onClick={null}
-          />
-        )
+        if (uid !== this.props.uid) {
+          otherPlayerRacks.push(
+            <Rack 
+              key={r}  
+              player={this.props.dbPlayers[uid] && (this.state.debugMode ? r + ': ' : '') + this.props.dbPlayers[uid].name + "'s tiles"}
+              tiles={this.getTilesRack(r)}
+              debug={this.state.debugMode}
+              onClick={null}
+            />
+          )
+        }
       }
       // Show the tile bag
-      debugRacks.push(
+      otherPlayerRacks.push(
         <Rack 
           key={-1}  
-          player='Tile Bag'
+          player='Tiles left in the bag'
           tiles={this.getTileBag()}
         />
       );
@@ -635,10 +638,14 @@ class Game extends React.Component {
       this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]]) {
       playerName = this.props.dbPlayers[this.props.dbPlayerSequence[this.props.dbCurrentPlayer]].name;
     }
+
     
     let message = '';
     let gameClassName = 'game';
-    if (this.props.dbCurrentPlayer === this.props.localPlayer) {
+    if (this.props.dbGameHasEnded) {
+      message = <div className='gamemessage'>{"The game has finished. Waiting for host to start next game..."}</div>;
+    }
+    else if (this.props.dbCurrentPlayer === this.props.localPlayer) {
       message = <div className='gamemessage gamemessage-currentturn'>{playerName + ", it's your turn!"}</div>;
       gameClassName = 'game game-currentturn';
     }
@@ -646,8 +653,19 @@ class Game extends React.Component {
       message = <div className='gamemessage'>{"Waiting for " + playerName + " to take their turn..."}</div>;
     }
 
-    let timer = Utils.getSmartAgeFromMs(this.props.estimatedServerTimeMs - this.props.dbLastTurnTime);
-
+    let timer = null;
+    let gameResult = null;
+    if (this.props.dbGameHasEnded && this.props.dbPlayers) {
+      gameResult = 
+        <GameResults
+          dbPlayers={this.props.dbPlayers}
+          dbPlayerSequence={this.props.dbPlayerSequence}
+        />
+    }
+    else {
+      timer = Utils.getSmartAgeFromMs(this.props.estimatedServerTimeMs - this.props.dbLastTurnTime);
+    }
+    
     return (
       <div className={gameClassName}>
         <div className="gameheader">
@@ -669,6 +687,7 @@ class Game extends React.Component {
           </div>
         </div>
         <div className="gamebody">
+          {gameResult}
           <Board 
             sets={this.getSets()}
             debug={this.state.debugMode}
@@ -691,10 +710,10 @@ class Game extends React.Component {
           • {Constants.NUMBER_OF_TILE_RANKS} numbers (ranks)
           • {Constants.NUMBER_OF_TILE_JOKERS} jokers
           • {TileHelper.getTotalTileCount()} total tiles
-          • {TileHelper.getTotalTileCount() - tilesInBag} tiles in play
-          • {tilesInBag} tiles in bag
+          • {TileHelper.getTotalTileCount() - (tilesInBag ?? 0)} tiles in play
+          • {tilesInBag ?? 0} tiles in bag
         </div>
-        {debugRacks}
+        {otherPlayerRacks}
       </div>
     );
   }

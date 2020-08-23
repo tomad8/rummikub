@@ -85,6 +85,7 @@ class RecentGames extends React.Component {
                 gameId: gameSnapshot.key,
                 host: gameSnapshot.val().host,
                 gameInProgress: gameSnapshot.val().gameInProgress,
+                gameHasEnded: gameSnapshot.val().gameHasEnded,
                 players: gameSnapshot.val().players,
                 lastTurnTime: gameSnapshot.val().lastTurnTime,
                 playerSequence: gameSnapshot.val().playerSequence,
@@ -125,6 +126,7 @@ class RecentGames extends React.Component {
           players = {a.players}
           currentPlayer = {a.playerSequence && a.playerSequence[a.currentPlayer]}
           gameInProgress = {a.gameInProgress}
+          gameHasEnded = {a.gameHasEnded}
           gameAge = {this.state.estimatedServerTimeMs - a.lastTurnTime}
         /> 
       ));

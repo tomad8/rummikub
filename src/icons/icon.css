@@ -18,8 +18,8 @@ SVG Icons - svgicons.sparkk.fr
 
 
 .svg-icon-button {
-  width: 1em;
-  height: 1em;
+  width: 1.5em;
+  height: 1.5em;
 }
 .svg-icon-button path,
 .svg-icon-button polygon,
@@ -32,16 +32,16 @@ SVG Icons - svgicons.sparkk.fr
 }
 
 
-.svg-icon-emphasis {
+.svg-icon-titlebar {
     width: 1em;
     height: 1em;
   }
-  .svg-icon-emphasis path,
-  .svg-icon-emphasis polygon,
-  .svg-icon-emphasis rect {
+  .svg-icon-titlebar path,
+  .svg-icon-titlebar polygon,
+  .svg-icon-titlebar rect {
     fill: var(--emphasis-color-titlebar);
   }
-  .svg-icon-emphasis circle {
+  .svg-icon-titlebar circle {
     stroke:var(--emphasis-color-titlebar);
     stroke-width: 1;
   }

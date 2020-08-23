@@ -51,11 +51,6 @@ class Set extends React.Component {
           {(this.props.score > 0 ? this.props.score + ' points' : '')}
           
         </div>
-    } else {
-      settitle = 
-        <div key={-2} className='set-subscript'>
-          {(this.props.score > 0 ? this.props.score: '')}
-        </div>
     }
 
     return (
