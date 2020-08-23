@@ -4,6 +4,8 @@ An online version of the popular game [Rummikub](https://en.wikipedia.org/wiki/R
 
 Work in progress... :)
 
+Grab some friends and play it at [rummi-hub.web.app/](https://rummi-hub.web.app/)
+
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
