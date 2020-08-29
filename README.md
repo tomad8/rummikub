@@ -1,8 +1,10 @@
 # Rummi-Hub
 
-An online version of the popular game [Rummikub](https://en.wikipedia.org/wiki/Rummikub) built using [React](https://reactjs.org/) 
+An online version of the popular game [Rummikub](https://en.wikipedia.org/wiki/Rummikub) built using [React](https://reactjs.org/) and [Firebase](https://firebase.google.com).
 
 Work in progress... :)
+
+Grab some friends and play it at [rummi-hub.web.app](https://rummi-hub.web.app)
 
 ---
 
