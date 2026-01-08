@@ -1,5 +1,6 @@
 import React from 'react';
 import './ChangeName.css';
+import { withRouter } from 'react-router-dom';
 import { withFirebase } from '../Firebase';
 
 class ChangeName extends React.Component {
@@ -17,10 +18,23 @@ class ChangeName extends React.Component {
   }
 
   updateUserName() {
+    let url = this.props.history.pathname;
+    let domain;
+    if (url) {
+      if (process.env.NODE_ENV !== 'production') console.log('Url is: ' + url)
+      let matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+      domain = matches && matches[1];  // domain will be null if no match is found
+      if (process.env.NODE_ENV !== 'production') console.log('domain is: ' + domain)
+    }
+    else {
+      console.error('URL is unknown, unable to obtain domain for firebase update');
+    }
+
     this.props.firebase
       .user(this.props.user.authUser.uid)
       .update({
         displayName: this.state.displayName.trim(),
+        domain: domain,
         })
       .then(
         () => {
@@ -104,4 +118,4 @@ class ChangeName extends React.Component {
   }
 }
 
-export default withFirebase(ChangeName);
+export default withRouter(withFirebase(ChangeName));
