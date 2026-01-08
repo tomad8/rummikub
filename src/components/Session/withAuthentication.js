@@ -50,7 +50,7 @@ const withAuthentication = Component => {
           user: {
             authUser: authUser, 
             dbUser: snapshot.val(), 
-            displayName: (snapshot.val() && snapshot.val().displayName ? snapshot.val().displayName : 'User' + authUser.uid.substring(0, 6)),
+            displayName: (snapshot.val() && snapshot.val().displayName ? snapshot.val().displayName : 'Player' + authUser.uid.substring(0, 4).toUpperCase()),
           }, 
         })
       });
